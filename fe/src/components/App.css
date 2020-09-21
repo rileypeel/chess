@@ -1,0 +1,161 @@
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.header {
+  width: 100vw;
+  height: 80px;
+}
+
+.header-title {
+  margin-left: 40px;
+  font-size: 24px;
+}
+
+.view {
+  margin-left: 40px;
+}
+
+.chat-container {
+  width: 300px;
+  height: 350px;
+  overflow-y: scroll;
+  border-style: solid;
+  border-width: 2px;
+  border-color: grey;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px 0 rgb(169,169,169);
+}
+
+.chat-header {
+  background-color: white;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-message {
+  padding-left: 10px;
+  padding-right: 5px;
+}
+
+.chat-message-box {
+  border-top: 2px;
+}
+
+.chat-message-input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+}
+
+
+.game-move-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-container {
+  position: absolute;
+  left: 550px;
+  top: 125px;
+  display: inline-block;
+  width:400px;
+  
+}
+
+.logo-text {
+  float: left;
+  padding-top: 47px;
+  margin: 0px;
+  font-size: 500%;
+  padding-left:0px;
+    
+}
+
+.logo-img {
+  height: auto;
+  width: 60px;
+  margin: 10px;
+}
+
+.login-box {
+  position: absolute;
+  display: inline-block;
+  top: 100px;
+  left: 50px;
+  border-style: solid;
+  box-shadow: 0 2px 8px 0 rgb(169,169,169);
+  border-width: 1px;
+  border-radius: 3px;
+  border-color: grey;
+  min-width: 250px;
+  max-width: 300px;
+  min-height: 200px;
+  max-height: 300px;
+}
+
+.form {
+  margin: 20px 10px 20px 10px;
+  text-align: center;
+}
+
+
+#login-button {
+  margin: 10px;
+  text-align: center;
+}
+#create-button {
+  margin-top: 10px;
+}
+
+.login-page {
+  background-color: green;
+}
+
+.square {
+  
+}
+
+.black {
+  background-color: black;
+
+}
+
+.light-grey {
+  background-color: grey;
+}
+
+.square-hover:hover {
+  background-color: darkgrey;
+}
+
+.selected {
+  background-color: lightblue;
+}
+
+.blue {
+  color: blueviolet;
+}
+
+.green {
+  color: green;
+}
+
+.board {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  width: 640px;
+  display: grid;
+  grid-template-columns: 80px 80px 80px 80px 80px 80px 80px 80px;
+  grid-template-rows: 80px 80px 80px 80px 80px 80px 80px 80px;
+}
