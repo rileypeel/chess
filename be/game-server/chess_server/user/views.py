@@ -69,3 +69,15 @@ class UserSearch(APIView):
         users = User.objects.filter(name__startswith=queryStr)
         serializer = UserSerializer(users, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
+class GameHistory(APIView):
+    """
+    Endpoint for game history for a user
+    """
+    def get(self, request, id):
+        """
+        Grab all finished games for user with given id
+        """
+        #TODO
+        return Response(status=status.HTTP_200_OK)

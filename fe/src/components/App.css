@@ -4,6 +4,7 @@
   flex-direction: row;
 }
 
+
 .header {
   width: 100vw;
   height: 80px;
@@ -14,8 +15,36 @@
   font-size: 24px;
 }
 
-.view {
-  margin-left: 40px;
+.home-view {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.home-margin-top {
+  margin-top: 40px;
+}
+
+.stats-column {
+  text-align: center;
+}
+
+.home-label {
+  min-width: 201px;
+  margin-top: 10px;
+}
+.invite-column {
+  text-align: center;
+}
+
+.stats-box {
+  border-style: solid;
+  text-align: center;
+  height: 300px;
+  width: 25vw;
+  height: 200px;
+  
+  min-width: 200px;
 }
 
 .chat-container {
@@ -85,6 +114,15 @@
   height: auto;
   width: 60px;
   margin: 10px;
+}
+
+
+.grey-box-shadow {
+  border-style: solid;
+  box-shadow: 0 2px 8px 0 rgb(169,169,169);
+  border-width: 1px;
+  border-radius: 3px;
+  border-color: grey;
 }
 
 .login-box {

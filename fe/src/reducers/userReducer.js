@@ -24,7 +24,6 @@ const initialState = {
 }
 
 function userReducer(state = initialState, action) {
-  
   switch (action.type) {
     case actions.LOGIN_USER:
       if (!action.id) {
@@ -34,6 +33,7 @@ function userReducer(state = initialState, action) {
         id: action.id,
         email: action.email,
         name: action.name,
+        rating: action.rating,
         isAuthenticated: true 
       } 
     case actions.REGISTER_USER:

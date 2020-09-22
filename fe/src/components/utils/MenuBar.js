@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom'
 import { HOME, LOGIN, USER, GAME } from '../../constants/app'
 import '../App.css'
 
+
+//TODO dispatch a logout 
 const MenuBar = (props) => {
   return (
     <div className="menu">
@@ -15,13 +17,6 @@ const MenuBar = (props) => {
           to={HOME}
           name='home'
           active={props.activeItem === 'home'}
-          onClick={props.itemClick}
-        />
-        <Menu.Item
-          as={Link}
-          to={USER}
-          name='user'
-          active={props.activeItem === 'user'}
           onClick={props.itemClick}
         />
         <Menu.Item

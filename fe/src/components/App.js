@@ -2,9 +2,8 @@ import React from 'react'
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import store from '../reducers/index'
-import Home from './Home'
+import Home from './home/Home'
 import Login from './login/Login'
-import User from './user/User'
 import GameController from './game/GameController'
 import MenuBar from './utils/MenuBar'
 import AcceptModal from './invite/AcceptModal'
@@ -33,9 +32,6 @@ const App = () => (
             <MenuBar/>
             <PrivateRoute path={HOME}>
               <Home/>
-            </PrivateRoute>
-            <PrivateRoute path={USER}>
-              <User/>
             </PrivateRoute>
             <PrivateRoute path={GAME}>
               <GameController/>

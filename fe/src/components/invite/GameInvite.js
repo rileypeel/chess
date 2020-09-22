@@ -34,7 +34,7 @@ const GameInvite = props => {
   }
   return (
     <div className="view">
-      <h1>Invite to game</h1>
+      <h2>Invite to game</h2>
       <InviteModal/>
       <Search
         results={props.results}
