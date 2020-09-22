@@ -24,10 +24,10 @@ const ERROR = 'client_error'
 const START_GAME = 'start_game'
 //SENDER TYPES
 const SEND_MESSAGE = 'my_message'
-const MOVE = 'my_move'
+const MOVE = 'game_my_move'
 const ACCEPT_INVITE = 'invite_accepted'
 const INVITE_RESPONSE = 'invite_response'
-const formatMoves = (piece) => {
+const formatMoves = piece => {
 
   const formattedMoves = piece.moves.map((move) => {
     return { col: move[0], row: move[1] }
@@ -67,7 +67,7 @@ const socketMiddleware = () => {
         console.log("in load moves")
         console.log(payload)
         store.dispatch(gameActions.loadMoves(payload.move_list, payload.game_id))
-        store.dispatch(gameActions.updateBoard())
+        store.dispatch(gameActions.updateBoard(payload.game_id))
         break
       case LOAD_GAME:
         store.dispatch(gameActions.loadGame(payload.game, payload.me, payload.opponent))
@@ -87,9 +87,8 @@ const socketMiddleware = () => {
       case ERROR:
         break
       case START_TURN:
-        const validMoves = payload.valid_moves.map((item) => formatMoves(item))
-        store.dispatch(gameActions.loadValidMoves(validMoves))
-        store.dispatch(gameActions.setMyTurn(true))
+        store.dispatch(gameActions.loadValidMoves(payload.valid_moves, payload.game_id))
+        store.dispatch(gameActions.setMyTurn(true, payload.game_id))
         break
       case START_GAME:
         notify("Game Started", `Game with ${payload.opponent.name} has started`, {
@@ -97,13 +96,13 @@ const socketMiddleware = () => {
           animation: "slide"
         })
         store.dispatch(gameActions.startGame(payload.game, payload.me, payload.opponent))
-        
+
         break
       case OPPONENT_MOVE:
         const move = payload.move
         const from = { col: move.from[0], row: move.from[1] }
         const to = { col: move.to[0], row: move.to[1] }
-        store.dispatch(gameActions.move(from, to))
+        store.dispatch(gameActions.move(from, to, payload.game_id))
         break
     }
   }
@@ -154,7 +153,8 @@ return store => next => action => {
           move: {
             from: [action.from.col, action.from.row],
             to: [action.to.col, action.to.row]
-          } 
+          },
+          game_id: action.gameId 
         }
         socket.send(JSON.stringify(message))
         break

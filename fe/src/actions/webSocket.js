@@ -10,9 +10,9 @@ export const SEND_MOVE = 'SEND_MOVE'
 export const SEND_CHAT_MESSAGE = 'SEND_CHAT_MESSAGE'
 export const SEND_RESIGN = 'SEND_RESIGN'
 
-export const connectGameWS = (gameUrl) => ({ type: CONNECT_GAME_WS, gameUrl }) 
+
 export const gameWSConnected = () => ({ type: GAME_WS_CONNECTED })
-export const sendMove = (from, to) => ({ type: SEND_MOVE, from, to })
+export const sendMove = (from, to, gameId) => ({ type: SEND_MOVE, from, to, gameId })
 export const connectWS = host => ({ type: CONNECT_WS, host })
 export const wsConnected = () => ({ type: WS_CONNECTED })
 export const disconnectWS = () => ({ type: DISCONNECT_WS })

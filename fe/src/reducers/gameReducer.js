@@ -130,9 +130,8 @@ const copyGame = game => {
     ...game,
     board: copyBoard(game.board),
     moveHistory: copyMoves(game.moveHistory),
-    opponent: { ...game.opponent },
-    selectedSquare: { ...game.selectedSquare },
-    opponent: { ...game.opponent, user: { ...game.opponent.user } }
+    selectedSquare: game.selectedSquare ? { ...game.selectedSquare } : null,
+    opponent: game.opponent ? { ...game.opponent, user: { ...game.opponent.user } } : null
   }
   return newGame
 }
@@ -203,7 +202,9 @@ function gameReducer(state = {}, action) {
       return state
     
     case actions.SET_MY_TURN:
+      console.log("setting turn")
       newState[action.gameId].myTurn = action.value
+      console.log(action.value)
       return newState
 
     case actions.SELECT_SQUARE:
@@ -222,19 +223,41 @@ function gameReducer(state = {}, action) {
       return newState
 
     case actions.MOVE:
-      const squareToMove = newState.board[action.fromPos.row][action.fromPos.col] 
-      newState.board[action.toPos.row][action.toPos.col] = { piece: { ...squareToMove.piece }, moves: []}
-      newState.board[action.fromPos.row][action.fromPos.col] = null
+      const squareToMove = newState[action.gameId].board[action.fromPos.row][action.fromPos.col] 
+      newState[action.gameId].board[action.toPos.row][action.toPos.col] = { piece: { ...squareToMove.piece }, moves: []}
+      newState[action.gameId].board[action.fromPos.row][action.fromPos.col] = null
       return newState
      
     case actions.LOAD_VALID_MOVES:
-      for (var i = 0; i < action.validMoves.length; i++) {
-        const movesItem = action.validMoves[i]
-        newState[action.gameId].board[movesItem.position.row][movesItem.position.col].moves = movesItem.moves.map(move => ({ ...move }))
-      }
-      return newState
-    
+      const board = newState[action.gameId].board
+      action.validMoves.forEach(item => {
+        board[item.position[1]][item.position[0]] = {
+          moves: item.moves.map(
+              move => (
+                { col: move[0], row: move[1] }
+              )
+            ),
+          piece: { ...board[item.position[1]][item.position[0]].piece }
+          }
+        }
+      )
 
+      console.log(newState)
+      return newState
+    case actions.UPDATE_BOARD:
+      const boardToUpdate = newState[action.gameId].board
+
+      newState[action.gameId].moveHistory.forEach(move => {
+        console.log("updating..")
+        console.log(move)
+        console.log(boardToUpdate)
+        boardToUpdate[move.to.row][move.to.col] = {
+          piece: { ...boardToUpdate[move.from.row][move.from.col].piece },
+          moves: []
+        }
+        boardToUpdate[move.from.row][move.from.col] = null
+      })
+      return newState
     case actions.GAME_END:
       return state //TODO
     default: 

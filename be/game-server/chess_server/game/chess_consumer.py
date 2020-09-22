@@ -78,6 +78,8 @@ class ChessConsumer(JsonWebsocketConsumer):
         """
         Helper to get correct game controller
         """
+        if isinstance(game_id, str):
+            game_id = uuid.UUID(game_id)
         for gc in self.game_controllers:
             if gc.game.id == game_id:
                 return gc
@@ -91,7 +93,6 @@ class ChessConsumer(JsonWebsocketConsumer):
         if type_str == constants.WS_LOGIN:
             self.login_user(message[constants.USER_ID])
             return
-        print(f"here is the type_str {type_str}")
         if self.scope['user'].id is None: #TODO TEST
             self.send_message({
                 constants.CLIENT_TYPE: constants.CLIENT_AUTH_ERROR
@@ -99,15 +100,17 @@ class ChessConsumer(JsonWebsocketConsumer):
 
         controller_type = type_str.split("_")[0]
         subtype_str = type_str[len(controller_type) + 1:]
-        print(f"controller type: {controller_type}")
         func = None
         if controller_type == constants.CONTROLLER_TYPE_GAME:
+            print(message[constants.GAME_ID])
             game_controller = self.get_controller(message[constants.GAME_ID])
             if not game_controller:
                 self.send_message({
-                    constants.CLIENT_TYPE: constants.CLIENT_TYPE_ERROR,
-                    constants.CLIENT_ERROR_MESSAGE: f"Error retrieving game.",
-                    constants.GAME_ID: message[constants.GAME_ID]
+                    constants.CONTENT: {
+                        constants.CLIENT_TYPE: constants.CLIENT_TYPE_ERROR,
+                        constants.CLIENT_ERROR_MESSAGE: f"Error retrieving game.",
+                        constants.GAME_ID: message[constants.GAME_ID]
+                    }
                 })
                 return
             func = getattr(game_controller, subtype_str)
@@ -141,7 +144,7 @@ class ChessConsumer(JsonWebsocketConsumer):
         """
         Send down json message to the client
         """
-        
+        print(message[constants.CONTENT])
         self.send_json(message[constants.CONTENT])
 
     def add_game(self, message):
@@ -167,11 +170,9 @@ class GameController:
         self.user = user
         self.chess_engine = ChessEngine()
         players = Player.objects.filter(game=game)
-        if players[0].user is user:
-            print("setting player in the if")
+        if players[0].user.id == user.id:
             self.my_player, self.opponent = players
         else:
-            print("setting player ihn the else")
             self.opponent, self.my_player = players
         if new_game:
             self.start_game()
@@ -194,7 +195,7 @@ class GameController:
             }
         })
         if self.my_player.colour is WHITE:
-            self.my_player.my_turn = True
+            self.my_player.turn = True
             self.my_player.save()
 
     def load_game(self, **kwargs):
@@ -221,7 +222,7 @@ class GameController:
         move down to client
         """
         print("loading moves...")
-        moves = Move.objects.filter(game=self.game).order_by('-move_number')
+        moves = Move.objects.filter(game=self.game).order_by('move_number')
         move_list = []
         for m in moves:
             self.chess_engine.load_move(m) 
@@ -238,6 +239,7 @@ class GameController:
                 constants.GAME_ID: str(self.game.id)
             } 
         })
+        print("finished loading moves")
 
     def load_messages(self, **kwargs):
         """
@@ -261,8 +263,9 @@ class GameController:
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
             constants.CONTENT: {
-                constants.TYPE: constants.CLIENT_START_TURN,
-                constants.CONTENT: self.chess_engine.format_moves()
+                constants.TYPE: constants.CLIENT_TYPE_START_TURN,
+                constants.VALID_MOVES: self.chess_engine.format_moves(),
+                constants.GAME_ID: str(self.game.id)
             }
         })
 
@@ -282,15 +285,15 @@ class GameController:
         Update the chess engine with the clients move,
         Update the DB with the move
         """
-        move_values = content[constants.MOVE]
+        move_values = kwargs.get(constants.MOVE, None)
         move_from, move_to = parse_move(move_values)
         try: 
-            self.chess_engine.player_move(move_from, move_to, colour=self.colour)
+            self.chess_engine.player_move(move_from, move_to, colour=self.my_player.colour)
         except InvalidMoveError as ex:
             async_to_sync(get_channel_layer().send)(self.user.channel_name, {
                 constants.TYPE: constants.CLIENT_SEND,
                 constants.CONTENT: {
-                    constants.TYPE: constants.CLIENT_ERROR,
+                    constants.TYPE: constants.CLIENT_TYPE_ERROR,
                     constants.CONTENT: f"Error: {ex.message}"
                 }
             })
@@ -298,11 +301,11 @@ class GameController:
             self.my_player.refresh_from_db()
             self.my_player.turn = False
             self.my_player.save()
+            Move.objects.save_move(self.chess_engine.history[-1], self.game)
             if self.chess_engine.status != IN_PROGRESS:
                 self.game.refresh_from_db()
                 self.game.status = self.chess_engine.status
                 self.game.save()
-            Move.objects.save_move(self.game.history[-1], self.game_model)
             
 
     def opponent_message(self, **kwargs):
@@ -319,7 +322,8 @@ class GameController:
             constants.TYPE: constants.CLIENT_SEND,
             constants.CONTENT: {
                 constants.TYPE: constants.CLIENT_TYPE_NEW_CHAT_MESSAGE,
-                constants.MESSAGE: new_message.message
+                constants.MESSAGE: new_message.message,
+                constants.GAME_ID: str(self.game.id)
             }
         })
 
@@ -328,6 +332,7 @@ class GameController:
         Update chess_engine with the opponents move
         Send valid moves over the channel
         """
+        print(self.user)
         move_id = kwargs.get(constants.ID, None)
         try:
             last_move = Move.objects.get(id=move_id)
@@ -343,7 +348,8 @@ class GameController:
                 constants.MOVE: {
                     constants.MOVE_FROM: move_from,
                     constants.MOVE_TO: move_to
-                }
+                },
+                constants.GAME_ID: str(self.game.id)
             }
         })
         
@@ -439,7 +445,6 @@ class InviteController:
         })
         
         if invite.accepted:
-            print("in invite accepted")
             game = Game.objects.create(
                 group_channel_name=f"group_{invite.game_id}"
             )
@@ -464,13 +469,13 @@ class InviteController:
         Creates player objects for the given game
         """
         random_colour = bool(random.randint(0, 1))
-        new_player_1 = Player.objects.create(
+        Player.objects.create(
             user=user1,
             game=game,
             winner=False,
             colour=random_colour
         )
-        new_player_2 = Player.objects.create(
+        Player.objects.create(
             user=user2,
             game=game,
             winner=False,

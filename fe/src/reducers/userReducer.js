@@ -9,6 +9,7 @@ const initialState = {
   name: null,
   email: null,
   id: null,
+  attemptedFetch: false,
   isAuthenticated: false,
   registerResult: null,
   wsInvite: null,
@@ -70,6 +71,8 @@ function userReducer(state = initialState, action) {
       return { ...state, inviteMessage: action.value}
     case actions.SET_SELECTED_USER:
       return { ...state, selectedUser: action.selectedUser }
+    case actions.SET_ATTEMPTED_FETCH:
+      return { ...state, attemptedFetch: action.value }
     default:
       return state
   }

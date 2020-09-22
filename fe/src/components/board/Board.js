@@ -16,36 +16,36 @@ const Board = props => {
     return <div></div>
   }
   const onSquareClick = position => {
-    //if nothing selected
-      // select if it is one of your pieces
-    // if piece is seleected 
-      // move if it is a valid move
-      // else unselect
+      console.log("in click callback")
+      console.log(position)
       const tryToSelect = (square) => {
         if (square) {
           if (gameData.myColour === square.piece.colour)  {
-            props.select(position, id)
+            props.select(position, props.id)
           }
         }
       }
       const square = gameData.board[position.row][position.col]
-      if (!gameData.selectedSquarePosition) {
+      if (!gameData.selectedSquare) {
         tryToSelect(square)
       } else {
         
         if (gameData.myTurn) {
+          console.log(gameData)
+          console.log(gameData)
+          const pieceToMove = gameData.board[gameData.selectedSquare.row][gameData.selectedSquare.col]
           
-          const pieceToMove = gameData.board[gameData.selectedSquarePosition.row][gameData.selectedSquarePosition.col]
           if (isPosIn(position, pieceToMove.moves)) { // seperate this into a seperate function
             
-            props.move(gameData.selectedSquarePosition, position, id)
-            props.sendMove(gameData.selectedSquarePosition, position, id)
+            props.move(gameData.selectedSquare, position, props.id)
+            props.sendMove(gameData.selectedSquare, position, props.id)
+            props.unselect(props.id)
           } else {
-            props.unselect(id) //add a select if this position has a piece of yours
+            props.unselect(props.id) //add a select if this position has a piece of yours
             tryToSelect(square)
           }
         } else {
-          props.unselect(id)
+          props.unselect(props.id)
         }
       }
     }

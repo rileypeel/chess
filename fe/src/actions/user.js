@@ -17,6 +17,7 @@ export const START_SEARCH = 'START_SEARCH'
 export const FINISH_SEARCH = 'FINISH_SEARCH'
 export const SET_INVITE_MESSAGE = 'SET_INVITE_MESSAGE'
 export const SET_SELECTED_USER = 'SET_SELECTED_USER'
+export const SET_ATTEMPTED_FETCH = 'SET_ATTEMPTED_FETCH'
 
 export const updateEmailField = (value) => ({ type: UPDATE_EMAIL_FIELD, value })
 export const updatePasswordField = (value) => ({ type: UPDATE_PASSWORD_FIELD, value })
@@ -26,6 +27,7 @@ export const setInviteSender = user => ({ type: SET_INVITE_SENDER, user })
 export const saveInvite = invite => ({ type: SAVE_INVITE, invite })
 export const setSelectedUser = (value) => ({ type: SET_SELECTED_USER, selectedUser: value })
 export const setInviteMessage = (value) => ({ type: SET_INVITE_MESSAGE, value })
+export const setAttemptedFetch = value => ({ type: SET_ATTEMPTED_FETCH, value })
 
 export function fetchUser() {
   console.log("attempting to fetch....")
@@ -33,6 +35,7 @@ export function fetchUser() {
     return api.fetchUser()
       .then(response => {
         dispatch({ type: LOGIN_USER, ...response })
+        dispatch(setAttemptedFetch(true))
       })
   }
 }

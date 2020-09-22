@@ -1,4 +1,4 @@
-import uuid, random, threading
+import uuid, random, threading, time, decimal
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.conf import settings
@@ -77,7 +77,7 @@ def get_opponent_channel_colour(my_colour, game):
     player1, player2 = Player.objects.filter(game=game)
     if player1.colour is my_colour:
         return player2.user.channel_name
-    return player2.user.channel_name
+    return player1.user.channel_name
 
 class UserManager(BaseUserManager):
     """Custom User Manager"""
@@ -277,7 +277,7 @@ class Game(models.Model):
         updates ratings
         """
         winning_colour = False
-        if self.status == self.GameStatus.RESIGNED:
+        if self.status == self.GameStatus.RESIGN:
             winning_colour = not self.resigned_colour
         else:
             winning_colour = Move.objects.filter(game=self).order_by(
@@ -330,16 +330,17 @@ class Player(models.Model):
         Set a timer when turn starts
         """
         if newValue:
-            self.turn_timer = threading.Timer(
-                int(self.time),
-                game_timeout_callback,
-                args=[self.game.id, self.id]
-            ).start()
-            self.turn_started_timestamp = round(time.time(), 2)
+            #self.turn_timer = threading.Timer(
+            #    int(self.time),
+            #    game_timeout_callback,
+            #    args=[self.game.id, self.id]
+            #).start()
+            self.turn_started_timestamp = decimal.Decimal(round(time.time(), 2) % 1800)
+            print("sending the start turn message")
             send(self.user.channel_name, consumer_cts.GAME_START_TURN, game_id=self.game.id)
         else:
-            self.time = round(time.time(), 2) - self.turn_started_timestamp
-            self.turn_timer.cancel()
+            self.time = decimal.Decimal(round(time.time(), 2) % 1800) - self.turn_started_timestamp
+            #self.turn_timer.cancel()
         self._turn = newValue
 
 
@@ -385,7 +386,7 @@ class Move(models.Model):
         if self._state.adding:
             super(*args, **kwargs).save()
             opponent_channel = get_opponent_channel_colour(self.colour, self.game)
-            send(opponent_channel, consumer_cts.GAME_OPPONENT_MOVE, game_id=self.game.id)
+            send(opponent_channel, consumer_cts.GAME_OPPONENT_MOVE, model_id=self.id, game_id=self.game.id)
         else:
             super(*args, **kwargs).save()
 
@@ -408,7 +409,8 @@ class ChatMessage(models.Model):
             send(
                 get_opponent_channel_user(self.user, self.game),
                 consumer_cts.GAME_OPPONENT_MESSAGE,
-                game_id=self.game.id
+                game_id=self.game.id,
+                model_id=self.id
             )
         else:
             super().save(*args, **kwargs)
