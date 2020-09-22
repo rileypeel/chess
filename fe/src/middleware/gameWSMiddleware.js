@@ -2,6 +2,7 @@ import * as actions from '../actions/gameWebSocket'
 import { useHistory } from 'react-router-dom'
 import { notify } from '../services/notification'
 import * as gameActions from '../actions/game'
+import { GAME } from '../constants/app'
 
 const OPPONENT_MOVE = 'opponent_move'
 const RECEIVE_MESSAGE = 'receive_message'
@@ -43,6 +44,7 @@ const socketMiddleware = () => {
       case START_GAME:
 
         store.dispatch(gameActions.setMyColour(payload.colour))
+        useHistory().push(GAME)
         break
       case OPPONENT_MOVE:
         const move = payload.move

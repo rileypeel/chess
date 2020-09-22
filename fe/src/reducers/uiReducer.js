@@ -5,7 +5,8 @@ const initialState = {
   registerModalOpen: false,
   registering: false,
   inviteModalOpen: false,
-  acceptModalOpen: false
+  acceptModalOpen: false,
+  activeTab: null
 }
 
 function uiReducer(state=initialState, action) {
@@ -20,6 +21,8 @@ function uiReducer(state=initialState, action) {
         return { ...state, inviteModalOpen: action.value }
       case actions.SET_ACCEPT_MODAL:
         return { ...state, acceptModalOpen: action.value }
+      case actions.SET_ACTIVE_TAB:
+        return { ...state, activeTab: action.value }
       default:
         return state
     }

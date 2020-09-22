@@ -64,11 +64,13 @@ const socketMiddleware = () => {
         //store.dispatch(gameActions.gameOver(false))
         break
       case LOAD_MOVES:
-        store.dispatch(gameActions.loadMoves(payload.move_list))
+        console.log("in load moves")
+        console.log(payload)
+        store.dispatch(gameActions.loadMoves(payload.move_list, payload.game_id))
         store.dispatch(gameActions.updateBoard())
         break
       case LOAD_GAME:
-        store.dispatch(gameActions.loadGame(payload.game))
+        store.dispatch(gameActions.loadGame(payload.game, payload.me, payload.opponent))
         break
       case LOAD_MESSAGES:
         break
@@ -94,7 +96,8 @@ const socketMiddleware = () => {
           type: "warning",
           animation: "slide"
         })
-        store.dispatch(gameActions.setMyColour(payload.colour))
+        store.dispatch(gameActions.startGame(payload.game, payload.me, payload.opponent))
+        
         break
       case OPPONENT_MOVE:
         const move = payload.move

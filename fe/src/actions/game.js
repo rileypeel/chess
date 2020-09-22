@@ -17,9 +17,10 @@ export const LOAD_GAME = 'LOAD_GAME'
 export const UPDATE_BOARD = 'UPDATE_BOARD'
 export const UPDATE_GAME_STATUS = 'UPDATE_GAME_STATUS'
 export const ADD_MESSAGE = 'ADD_MESSAGE'
+export const START_GAME = 'START_GAME'
 
 export const updateBoard = gameId => ({ type: UPDATE_BOARD, gameId })
-export const loadGame = game => ({ type: LOAD_GAME, game })
+export const loadGame = (game, me, opponent) => ({ type: LOAD_GAME, game, me, opponent })
 export const setMyColour = (colour, gameId) => ({ type: SET_COLOUR, colour, gameId})
 //export const setGameId = (gameId) => ({ type: SET_GAME_ID, gameId }) //TODO dump?
 export const selectSquare = (position, gameId) => ({ type: SELECT_SQUARE, position, gameId })
@@ -30,3 +31,4 @@ export const loadValidMoves = (validMoves, gameId) => ({ type: LOAD_VALID_MOVES,
 export const loadMoves = (moves, gameId) => ({ type: LOAD_MOVES, moves, gameId })
 export const updateGameStatus = (status, gameId) => ({ type: UPDATE_GAME_STATUS, status, gameId })
 export const addMessage = (message, gameId) => ({ type: ADD_MESSAGE, message, gameId })
+export const startGame = (game, me, opponent) => ({ type: START_GAME, game, me, opponent })

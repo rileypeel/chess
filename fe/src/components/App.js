@@ -5,7 +5,7 @@ import store from '../reducers/index'
 import Home from './Home'
 import Login from './login/Login'
 import User from './user/User'
-import Game from './game/Game'
+import GameController from './game/GameController'
 import MenuBar from './utils/MenuBar'
 import AcceptModal from './invite/AcceptModal'
 import ReactNotification from 'react-notifications-component'
@@ -22,7 +22,7 @@ const App = () => (
       <ReactNotification/>
       <Switch>
         <Route path={'/gamefornow'}> //TODO TESTING REMOVE LATER
-          <Game/>
+          <GameController/>
         </Route>
         <Route path={LOGIN}>
           <Login/>
@@ -38,7 +38,7 @@ const App = () => (
               <User/>
             </PrivateRoute>
             <PrivateRoute path={GAME}>
-              <Game/>
+              <GameController/>
             </PrivateRoute>
           </WebSocketConnection>
         </Route>

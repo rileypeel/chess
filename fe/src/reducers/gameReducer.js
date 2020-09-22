@@ -1,4 +1,5 @@
 import * as actions from '../actions/game'
+import { setActiveItem } from '../actions/ui'
 
 import { pieces, BLACK, WHITE } from '../constants/app'
 
@@ -35,7 +36,7 @@ const posToObj = position => {
 
 
 
-const dummyBoard = () => {
+const startingBoard = () => {
   var board = [[
     { piece: pieces.whiteRook, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
     { piece: pieces.whiteKnight, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
@@ -108,38 +109,71 @@ export const UPDATE_GAME_STATUS = 'UPDATE_GAME_STATUS' d
 export const ADD_MESSAGE = 'ADD_MESSAGE'
 */
 
-/*
-const initialState = {
+
+
+// Helper functions for copying state 
+
+const copyMoves = moves => (moves.map(move => ({ ...move })))  
+
+const copyBoard = board => (
+  board.map(
+    row => row.map(
+      square => (
+        square ? { piece: { ...square.piece }, moves: copyMoves(square.moves) } : null
+      )
+    )
+  )
+)
+
+const copyGame = game => {
+  const newGame = {
+    ...game,
+    board: copyBoard(game.board),
+    moveHistory: copyMoves(game.moveHistory),
+    opponent: { ...game.opponent },
+    selectedSquare: { ...game.selectedSquare },
+    opponent: { ...game.opponent, user: { ...game.opponent.user } }
+  }
+  return newGame
+}
+
+const copyState = state => {
+  const newState = {}
+  for (const key in state) {
+    newState[key] = copyGame(state[key])
+  }
+  return newState
+} 
+
+const getInitialGameState = () => ({
   connected: false,
   id: null,
-  board: dummyBoard(),
+  board: startingBoard(),
   moveHistory: [],
   selectedSquare: null,
   myTurn: false,
-  validMoves: [],
   myColour: BLACK,
+  me: null,
   opponent: null,
   gameStatus: true
-}
-*/
+})
 
 const initialState = {
   
 }
 
 
-function gameReducer(state = initialState, action) {
-  console.log(state)
+function gameReducer(state = {}, action) {
+  const newState = copyState(state)
   switch (action.type) {
     case actions.LOAD_GAME:
-      console.log(action.game)
       if (!state[action.game.id]) {
-        const newGameObj = {
-          status: action.game._status,
-          players: action.game.players,
-          board: getEmptyBoard
-        }
-        const newState = { ...state }
+        const newGameObj = getInitialGameState()
+        newGameObj.status = action.game._status
+        newGameObj.myColour = action.me.colour
+        newGameObj.myTime = action.me.time
+        newGameObj.opponent = { ...action.opponent, user: { ...action.opponent.user } }
+        newGameObj.id = action.game.id
         newState[action.game.id] = newGameObj
         return newState
       }
@@ -152,66 +186,57 @@ function gameReducer(state = initialState, action) {
           to: { row: moveItem.to[1], col: moveItem.to[0] }
         }
       })
-      return { ...state,  }
-    case actions.UPDATE_BOARD:
+      newState[action.gameId].moveHistory = moves //TODO
+      return newState
 
-      return state
-    case actions.SET_MY_TURN:
-      return { ...state, myTurn: action.value }
-    case actions.SELECT_SQUARE:
-      
-      return { ...state,
-        selectedSquare: {
-          col: action.position.col,
-          row: action.position.row
-        }
+    case actions.START_GAME:
+      if (!state[action.game.id]) {
+        const newGameObj = getInitialGameState()
+        newGameObj.status = action.game._status
+        newGameObj.myColour = action.me.colour
+        newGameObj.myTime = action.me.time
+        newGameObj.opponent = { ...action.opponent, user: { ...action.opponent.user } }
+        newGameObj.id = action.game.id
+        newState[action.game.id] = newGameObj
+        return newState
       }
+      return state
+    
+    case actions.SET_MY_TURN:
+      newState[action.gameId].myTurn = action.value
+      return newState
+
+    case actions.SELECT_SQUARE:
+      newState[action.gameId].selectedSquare = {
+        col: action.position.col,
+        row: action.position.row
+      }
+      return newState
     
     case actions.SET_COLOUR:
-      
-      return { ...state, myColour: action.colour }
+      newState[action.gameId].myColour = action.colour
+      return newState
+
     case actions.UNSELECT_SQUARE:
-      return { ...state, selectedSquare: null }
+      newState[action.gameId].selectedSquare = null
+      return newState
+
     case actions.MOVE:
-      
-      const newState = { 
-        ...state, 
-        myTurn: false,
-        selectedSquare: null,
-        board: state.board.map(boardRow => {
-          return boardRow.map(squareObj => { 
-              if (squareObj) return { piece: { ...squareObj.piece }, moves: squareObj.moves.map((move, moveInd) => ({ ...move }))}
-              return null
-            })
-        })
-      }
       const squareToMove = newState.board[action.fromPos.row][action.fromPos.col] 
-      newState.board[action.toPos.row][action.toPos.col] = { piece: { ...squareToMove.piece }, moves: squareToMove.moves.map((move, moveInd) => ({ ...move }))}
+      newState.board[action.toPos.row][action.toPos.col] = { piece: { ...squareToMove.piece }, moves: []}
       newState.board[action.fromPos.row][action.fromPos.col] = null
-      
       return newState
      
     case actions.LOAD_VALID_MOVES:
-      const boardCopy =  state.board.map(
-        boardRow => boardRow.map(
-          squareObj => squareObj
-            ? { piece: { ...squareObj.piece }, moves: squareObj.moves.map(move => ({ ...move }))}
-            : null
-        )
-      )
-      
       for (var i = 0; i < action.validMoves.length; i++) {
         const movesItem = action.validMoves[i]
-        boardCopy[movesItem.position.row][movesItem.position.col].moves = movesItem.moves.map(move => ({ ...move }))
+        newState[action.gameId].board[movesItem.position.row][movesItem.position.col].moves = movesItem.moves.map(move => ({ ...move }))
       }
-      return { 
-        ...state, 
-        myTurn: false,
-        selectedSquare: null,
-        board: boardCopy
-      }
+      return newState
+    
+
     case actions.GAME_END:
-      return { ...state, gameStatus: action.status}
+      return state //TODO
     default: 
       return state
   }

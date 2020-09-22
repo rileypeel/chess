@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.conf import settings
 import chess.constants
+import core.constants as constants
 import game.constants as consumer_cts
 import chess.piece
 from channels.layers import get_channel_layer
@@ -52,6 +53,13 @@ def group_send(group_name, message_type, game_id=None, model_id=None):
             consumer_cts.ID: model_id
         }
     })
+
+def dispatch_callbacks(callbacks):
+    """
+    Helper for calling list of callback functions
+    """
+    for cb in callbacks:
+        cb[constants.FUNCTION](*cb[constants.ARGS] **cb[constants.KWARGS])
 
 def get_opponent_channel_user(me, game):
     """
@@ -169,7 +177,12 @@ class GameInvite(models.Model):
         """
         Observe property changes
         """
-        send(self.from_user.channel_name, consumer_cts.INVITE_UPDATE, model_id=self.id)
+        self.callback = {
+            constants.FUNCTION: send,
+            constants.ARGS: (self.from_user.channel_name,
+            consumer_cts.INVITE_UPDATE),
+            constants.KWARGS: {'model_id': self.id}
+        }   
         self._accepted = new_value
 
     @property
@@ -181,19 +194,26 @@ class GameInvite(models.Model):
         """
         Observe property changes
         """
-        send(self.from_user.channel_name, consumer_cts.INVITE_UPDATE, model_id=self.id)
+        self.callback = {
+            constants.FUNCTION: send,
+            constants.ARGS: (self.from_user.channel_name,
+            consumer_cts.INVITE_UPDATE),
+            constants.KWARGS: {'model_id': self.id}
+        }   
         self._declined = new_value
 
     def save(self, *args, **kwargs):
         """
         Override save to observe 
         """
+        callback = getattr(self, constants.CALLBACK, None)
         if self._state.adding:
             super().save(*args, **kwargs)
             send(self.to_user.channel_name, consumer_cts.INVITE_RECEIVED, model_id=self.id)
         else:
             super().save(*args, **kwargs)
-        
+        if callback:
+            callback[constants.FUNCTION](*callback[constants.ARGS], **callback[constants.KWARGS])
 
 class Game(models.Model):
     """Model for a Game"""
@@ -228,7 +248,11 @@ class Game(models.Model):
         if self._status != new_status and new_status != self.GameStatus.IN_PROGRESS:
             self.set_winner()
         self._status = new_status
-        group_send(self.group_channel_name, consumer_cts.GAME_STATUS_UPDATE, game_id=self.id)
+        self.status_callback = {
+            constants.FUNCTION: group_send,
+            constants.ARGS: (self.group_channel_name, consumer_cts.GAME_STATUS_UPDATE,),
+            constants.KWARGS: {'game_id': self.id}
+        }
     
     @property
     def started(self):
@@ -239,10 +263,7 @@ class Game(models.Model):
         """
         Observer property changes to notify when game starts
         """
-        print(f"here is old val {self._started}")
-        print(f"here is new val {new_value}")
         if not self._started and new_value:
-            print("in if")
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(self.group_channel_name, {
                 consumer_cts.TYPE: consumer_cts.ADD_GAME,
@@ -276,6 +297,16 @@ class Game(models.Model):
         player2.user.update_rating(self.status, player2.winner, player1.user.rating)
         player1.user.save()
         player2.user.save()
+
+    def save(self, *args, **kwargs):
+        """
+        Override save
+        """
+        super().save(*args, **kwargs)
+        callback = getattr(self, 'status_callback', None)
+        if callback:
+            callback[constants.FUNCTION](*callback[constants.ARGS], **callback[constants.KWARGS])
+
 
 
 class Player(models.Model):

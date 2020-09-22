@@ -168,8 +168,10 @@ class GameController:
         self.chess_engine = ChessEngine()
         players = Player.objects.filter(game=game)
         if players[0].user is user:
+            print("setting player in the if")
             self.my_player, self.opponent = players
         else:
+            print("setting player ihn the else")
             self.opponent, self.my_player = players
         if new_game:
             self.start_game()
@@ -232,7 +234,8 @@ class GameController:
             constants.TYPE: constants.CLIENT_SEND,
             constants.CONTENT: {
                 constants.TYPE: constants.CLIENT_TYPE_LOAD_MOVES,
-                constants.MOVE_LIST: move_list
+                constants.MOVE_LIST: move_list,
+                constants.GAME_ID: str(self.game.id)
             } 
         })
 
@@ -419,6 +422,7 @@ class InviteController:
         """
         Send invite update over channel layer for client
         """
+        print("in update invite")
         invite_id = kwargs.get(constants.ID)
         try:
             invite = GameInvite.objects.get(id=invite_id)

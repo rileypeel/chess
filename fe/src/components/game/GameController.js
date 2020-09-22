@@ -1,46 +1,44 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
+import { setActiveTab } from '../../actions/ui'
 import '../App.css'
+import Game from './Game'
 
-const panes = [
-  {
-    menuItem: 'Tab 1',
-    render: () => <Tab.Pane attached={false}>Tab 1 Content</Tab.Pane>,
-  },
-  {
-    menuItem: 'Tab 2',
-    render: () => <Tab.Pane attached={false}>Tab 2 Content</Tab.Pane>,
-  },
-  {
-    menuItem: 'Tab 3',
-    render: () => <Tab.Pane attached={false}>Tab 3 Content</Tab.Pane>,
-  },
-]
-  
+
 const GameController = props => {
 
-  const panes = Object.keys(props.games).forEach(key => {
+  const panes = Object.keys(props.games).map(key => {
 
     return {
       menuItem: `Game Vs. ${'fakeopponent1'}`,
       render: () => <Game id={key}/>
     }
   })
-  
+
+  console.log(panes)
 
 
-  return panes ? <Tab menu={{ secondary: true }} panes={panes} /> : <div>{ "No active games." }</div>
+  return panes ?
+    <Tab
+      menu={{ secondary: true }}
+      panes={panes} 
+      /> 
+    : 
+    <div>{ "No active games." }</div>
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
+  console.log(state)
   return {
-    games: state.game
+    games: state.game,
+    //activeTab: state.ui.activeTab
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
+    //setTab: value => dispatch(setActiveTab(value))
   }
 }
 

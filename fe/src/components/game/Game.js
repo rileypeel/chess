@@ -19,7 +19,7 @@ const Game = props => {
         <UserLabel name={"Poo"} rating={2000}/>
       </div>
       <div style={{ float: "left" }}>
-        <Board />
+        <Board id={props.id}/>
       </div>
       <Chat/>
       <GameStatusBox/>

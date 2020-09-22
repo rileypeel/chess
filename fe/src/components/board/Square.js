@@ -9,18 +9,7 @@ const Square = props => {
   const selected = isSquareSelected(props.position, props.selectedPosition) //Use isPosEqual
   const square = props.board[props.position.row][props.position.col]
   const piece = square ? square.piece : null
-  const clicked = () => {
-    if (props.type) {
-      if (props.myColour === props.type.colour) {
-        props.selected ? props.unselect() : props.select(props.position)
-      }
-    } else {
-      if (props.selectedPosition) {
-
-        props.move(props.position)
-      }
-    }
-  }
+  
   const squareClasses = `square square-hover ${squareColor ? "light-grey" : ""} ${selected ? "selected" : ""}`
   return (
     <div onHover onClick={() => props.onSquareClick(props.position)} className={squareClasses}>
@@ -48,13 +37,7 @@ const isSquareSelected = (position, selectedPosition) => {
   return (position.col === selectedPosition.col && position.row === selectedPosition.row)
 }
 
-const mapStateToProps = (state) => {
-  return {
-    myColour: state.game.myColour,
-    board: state.game.board,
-    selectedPosition: state.game.selectedSquare 
-  }
-}
+
 
 const mapDispatchToProps = (dispatch) => {
   return {
@@ -63,4 +46,4 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Square)
+export default connect(null, mapDispatchToProps)(Square)
