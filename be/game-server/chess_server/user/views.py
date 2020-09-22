@@ -7,7 +7,8 @@ from django.contrib.auth import authenticate, login
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from user.serializers import UserSerializer, AuthTokenSerializer, GameInviteWriteSerializer
-from core.models import User, GameInvite
+from game.serializers import GameSerializer
+from core.models import User, GameInvite, Game
 import json
 
 class CreateUserView(generics.CreateAPIView):
@@ -79,5 +80,19 @@ class GameHistory(APIView):
         """
         Grab all finished games for user with given id
         """
-        #TODO
-        return Response(status=status.HTTP_200_OK)
+        try:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            print(f"Error user with id: {id} not found.")
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        games = Game.objects.filter(
+            player__user=user
+        ).exclude(
+            _status=Game.GameStatus.IN_PROGRESS
+        ).order_by(
+            'date_played'
+        )[0:10]
+        games
+        serializer = GameSerializer(games, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)

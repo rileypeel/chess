@@ -9,6 +9,7 @@ import chess.piece
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+# USEFUL for querying through the many to many field: Game.objects.filter(player__user=tom)
 
 def game_timeout_callback(game_id, player_id):
     """
