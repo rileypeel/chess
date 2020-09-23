@@ -67,9 +67,9 @@ def get_opponent_channel_user(me, game):
     Helper method returns channel name of opponent
     """
     player1, player2 = Player.objects.filter(game=game)
-    if player1.user is me:
+    if player1.user.id == me.id:
         return player2.user.channel_name
-    return player2.user.channel_name
+    return player1.user.channel_name
 
 def get_opponent_channel_colour(my_colour, game):
     """
@@ -308,6 +308,8 @@ class Game(models.Model):
         if callback:
             callback[constants.FUNCTION](*callback[constants.ARGS], **callback[constants.KWARGS])
 
+    def __str__(self):
+        return str(self.id)
 
 
 class Player(models.Model):
@@ -373,18 +375,39 @@ class Move(models.Model):
     to_position_x = models.IntegerField()
     to_position_y = models.IntegerField()
     move_type = models.CharField(max_length=32, choices=MoveType.choices) 
+    notation = models.CharField(max_length=10)
 
     def get_move(self):
         return (
             (self.from_position_x, self.from_position_y),
             (self.to_position_x, self.to_position_y)
         )
-    
+
+    def get_notation(self):
+        """
+        Computes string in chess notation for a move
+        """
+        col_ascii = ord('a') + 1    
+        from_row = self.from_position_y + 1
+        to_row = self.to_position_y + 1
+        from_col = chr(col_ascii + self.from_position_x)
+        to_col = chr(col_ascii + self.to_position_x)
+        if self.move_type in (self.MoveType.REGULAR, self.MoveType.EN_PASSANT):
+            if self.captured_piece_type:
+                return f"{self.piece_type}x{to_col}{to_row}"
+            return f"{self.piece_type}x{to_col}{to_row}"
+
+        if self.move_type is self.MoveType.CASTLE:
+            return "0-0"
+
+
     def save(self, *args, **kwargs):
         """
         Override save to observe when a move is created
         """
+
         if self._state.adding:
+            self.notation = self.get_notation()
             super(*args, **kwargs).save()
             opponent_channel = get_opponent_channel_colour(self.colour, self.game)
             send(opponent_channel, consumer_cts.GAME_OPPONENT_MOVE, model_id=self.id, game_id=self.game.id)
@@ -404,9 +427,10 @@ class ChatMessage(models.Model):
         """
         Override save to observe when a message is created
         """
-        super().save(*args, **kwargs)
         if self._state.adding:
             super().save(*args, **kwargs)
+            print(f"{self.user} saved a message")
+
             send(
                 get_opponent_channel_user(self.user, self.game),
                 consumer_cts.GAME_OPPONENT_MESSAGE,

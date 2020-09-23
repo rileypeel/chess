@@ -59,15 +59,17 @@ class ChessConsumer(JsonWebsocketConsumer):
         Create game controllers for all active games and 
         load game history into chess engines
         """
+        print("loading games") #TODO fix this thing
         players = Player.objects.filter(user=self.scope['user'])
         for p in players: #TODO this needs testing
             try:
                 game = Game.objects.get(player=p, _status=Game.GameStatus.IN_PROGRESS)
             except Game.DoesNotExist:
-                return
-            game_controller = GameController(game, self.scope['user'], new_game=False)
-            game_controller.load_game()
-            self.game_controllers.append(game_controller)
+                print("game not found ")
+            else:
+                game_controller = GameController(game, self.scope['user'], new_game=False)
+                game_controller.load_game()
+                self.game_controllers.append(game_controller)
 
     def disconnect(self, code):
         """
@@ -218,6 +220,7 @@ class GameController:
             }
         })
         self.load_moves()
+        self.load_messages()
 
     def load_moves(self, **kwargs):
         """
@@ -233,6 +236,7 @@ class GameController:
             move_list.append({
                 constants.MOVE_FROM: move_from,
                 constants.MOVE_TO: move_to,
+                constants.NOTATION: m.notation
             })
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
@@ -242,6 +246,7 @@ class GameController:
                 constants.GAME_ID: str(self.game.id)
             } 
         })
+
         print("finished loading moves")
 
     def load_messages(self, **kwargs):
@@ -249,13 +254,16 @@ class GameController:
         Load all chat messages from the db, 
         and send down to client
         """
+        
         messages = ChatMessage.objects.filter(game=self.game)
-        serializer = serializers.ChatMessageSerializer(data=messages, many=True)
+        if not messages:
+            return
+        serializer = serializers.ChatMessageSerializer(messages, many=True)
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
             constants.CONTENT: {
                 constants.TYPE: constants.CLIENT_TYPE_LOAD_MESSAGES,
-                constants.CONTENT: serializer.data
+                constants.CHAT_MESSAGE: serializer.data
             }
         })
 
@@ -279,9 +287,10 @@ class GameController:
         new_message = ChatMessage(
             user=self.user,
             game=self.game,
-            message=content[constants.CHAT_MESSAGE]
+            message=kwargs[constants.CHAT_MESSAGE]
         )
         new_message.save()
+        
 
     def my_move(self, **kwargs):
         """
@@ -305,6 +314,7 @@ class GameController:
             self.my_player.turn = False
             self.my_player.save()
             Move.objects.save_move(self.chess_engine.history[-1], self.game)
+            
             if self.chess_engine.status != IN_PROGRESS:
                 self.game.refresh_from_db()
                 self.game.status = self.chess_engine.status
@@ -315,18 +325,19 @@ class GameController:
         """
         Retrieve last message from DB and send down to client
         """
+        print(self.user)
         message_id = kwargs.get(constants.ID, None)
         try:
             new_message = ChatMessage.objects.get(id=message_id)
         except ChatMessage.DoesNotExist:
             print(f'Error: message with id: {message_id} not found')
             return 
+        serializer = serializers.ChatMessageSerializer(new_message)
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
             constants.CONTENT: {
                 constants.TYPE: constants.CLIENT_TYPE_NEW_CHAT_MESSAGE,
-                constants.MESSAGE: new_message.message,
-                constants.GAME_ID: str(self.game.id)
+                constants.CHAT_MESSAGE: serializer.data
             }
         })
 
@@ -350,7 +361,8 @@ class GameController:
                 constants.TYPE: constants.CLIENT_TYPE_OPPONENT_MOVE,
                 constants.MOVE: {
                     constants.MOVE_FROM: move_from,
-                    constants.MOVE_TO: move_to
+                    constants.MOVE_TO: move_to,
+                    constants.NOTATION: last_move.notation
                 },
                 constants.GAME_ID: str(self.game.id)
             }

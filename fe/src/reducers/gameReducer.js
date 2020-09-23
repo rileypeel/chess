@@ -131,7 +131,9 @@ const copyGame = game => {
     board: copyBoard(game.board),
     moveHistory: copyMoves(game.moveHistory),
     selectedSquare: game.selectedSquare ? { ...game.selectedSquare } : null,
-    opponent: game.opponent ? { ...game.opponent, user: { ...game.opponent.user } } : null
+    opponent: game.opponent ? { ...game.opponent, user: { ...game.opponent.user } } : null,
+    messages: game.messages.map(message => ({ ...message })),
+    moveNotation: game.moveNotation.map(move => (move))
   }
   return newGame
 }
@@ -149,12 +151,14 @@ const getInitialGameState = () => ({
   id: null,
   board: startingBoard(),
   moveHistory: [],
+  messages: [],
   selectedSquare: null,
   myTurn: false,
   myColour: BLACK,
   me: null,
   opponent: null,
-  gameStatus: true
+  gameStatus: true,
+  moveNotation: []
 })
 
 const initialState = {
@@ -260,6 +264,15 @@ function gameReducer(state = {}, action) {
       return newState
     case actions.GAME_END:
       return state //TODO
+
+    case actions.ADD_MESSAGE:
+      console.log(action)
+      newState[action.gameId].messages.push({ ...action.message })
+      console.log(newState)
+      return newState
+    case actions.ADD_NOTATION:
+      newState[action.gameId].moveNotation.push(action.notation)
+      return newState
     default: 
       return state
   }

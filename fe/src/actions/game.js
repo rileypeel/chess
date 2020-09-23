@@ -18,6 +18,7 @@ export const UPDATE_BOARD = 'UPDATE_BOARD'
 export const UPDATE_GAME_STATUS = 'UPDATE_GAME_STATUS'
 export const ADD_MESSAGE = 'ADD_MESSAGE'
 export const START_GAME = 'START_GAME'
+export const ADD_NOTATION = 'ADD_NOTATION'
 
 export const updateBoard = gameId => ({ type: UPDATE_BOARD, gameId })
 export const loadGame = (game, me, opponent) => ({ type: LOAD_GAME, game, me, opponent })
@@ -32,3 +33,4 @@ export const loadMoves = (moves, gameId) => ({ type: LOAD_MOVES, moves, gameId }
 export const updateGameStatus = (status, gameId) => ({ type: UPDATE_GAME_STATUS, status, gameId })
 export const addMessage = (message, gameId) => ({ type: ADD_MESSAGE, message, gameId })
 export const startGame = (game, me, opponent) => ({ type: START_GAME, game, me, opponent })
+export const addMoveNotation = (notation, gameId) => ({ type: ADD_NOTATION, notation, gameId })

@@ -73,6 +73,8 @@ function userReducer(state = initialState, action) {
       return { ...state, selectedUser: action.selectedUser }
     case actions.SET_ATTEMPTED_FETCH:
       return { ...state, attemptedFetch: action.value }
+    case actions.SET_HISTORY:
+      return state
     default:
       return state
   }

@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, StringRelatedField
+from rest_framework.serializers import ModelSerializer, StringRelatedField, SlugRelatedField
 from core.models import Game, Move, ChatMessage, Player
 from user.serializers import UserSerializer
 
@@ -32,6 +32,8 @@ class ChatMessageSerializer(ModelSerializer):
     """
     Serializer or Message Model
     """
+    user = SlugRelatedField(read_only=True, slug_field='name')
+    game = StringRelatedField(read_only=True)
     class Meta:
         model = ChatMessage
         fields = '__all__'

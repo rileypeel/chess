@@ -10,7 +10,7 @@ const REGISTER_URL = `${BASE_URL}user/create/`
 const SEARCH_URL = `${BASE_URL}user/search/`
 const INVITE_URL = `${BASE_URL}user/create-invite/`
 const INVITE_LIST_URL = `${BASE_URL}user/invites/`
-
+const GAME_HISTORY_URL = `${BASE_URL}user/completed-games/`
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -65,6 +65,12 @@ export default {
 
   async retrieveInvites(user_id) {
     const response = await httpGet(INVITE_LIST_URL)
+    if (response.status == 200) {
+      return await response.json()
+    }
+  },
+  async fetchGameHistory(user_id) {
+    const response = await httpGet(`${GAME_HISTORY_URL}${user_id}`)
     if (response.status == 200) {
       return await response.json()
     }

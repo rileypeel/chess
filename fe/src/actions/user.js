@@ -18,6 +18,7 @@ export const FINISH_SEARCH = 'FINISH_SEARCH'
 export const SET_INVITE_MESSAGE = 'SET_INVITE_MESSAGE'
 export const SET_SELECTED_USER = 'SET_SELECTED_USER'
 export const SET_ATTEMPTED_FETCH = 'SET_ATTEMPTED_FETCH'
+export const SET_HISTORY = 'SET_HISTORY'
 
 export const updateEmailField = (value) => ({ type: UPDATE_EMAIL_FIELD, value })
 export const updatePasswordField = (value) => ({ type: UPDATE_PASSWORD_FIELD, value })
@@ -28,7 +29,16 @@ export const saveInvite = invite => ({ type: SAVE_INVITE, invite })
 export const setSelectedUser = (value) => ({ type: SET_SELECTED_USER, selectedUser: value })
 export const setInviteMessage = (value) => ({ type: SET_INVITE_MESSAGE, value })
 export const setAttemptedFetch = value => ({ type: SET_ATTEMPTED_FETCH, value })
+export const setHistory = response => ({ type: SET_HISTORY, ...response })
 
+export function getGameHistory(userId) {
+  return dispatch => {
+    return api.fetchGameHistory(userId).then(response => {
+      console.log(response)
+      dispatch(setHistory(response))
+    })
+  }
+}
 export function fetchUser() {
   console.log("attempting to fetch....")
   return dispatch => {
