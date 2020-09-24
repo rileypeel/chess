@@ -9,7 +9,7 @@ import Game from './Game'
 const GameController = props => {
 
   const panes = Object.keys(props.games).map(key => {
-    const opponentName = props.games[key].opponent.user.name
+    const opponentName = props.games[key].game.opponent.user.name
     const gameId = key.substring(0, 3)
     return {
       menuItem: `Game (${gameId}) Vs. ${opponentName}`,
@@ -17,7 +17,6 @@ const GameController = props => {
     }
   })
 
-  console.log(panes)
 
 
   return panes ?
@@ -30,7 +29,6 @@ const GameController = props => {
 }
 
 const mapStateToProps = state => {
-  console.log(state)
   return {
     games: state.game
     //activeTab: state.ui.activeTab

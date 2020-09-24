@@ -6,7 +6,6 @@ import HomeStatsBox from './HomeStatsBox'
 import '../App.css' 
 
 const Home = props => {
-  console.log(props.rating)
   return (
     <div className="home-view">
       <div className="home-margin-top invite-column">

@@ -7,7 +7,7 @@ import '../App.css'
 const Square = props => {
   const squareColor = isSquareBlack(props.position.col, props.position.row)
   const selected = isSquareSelected(props.position, props.selectedPosition) //Use isPosEqual
-  const square = props.board[props.position.row][props.position.col]
+  const square = props.square
   const piece = square ? square.piece : null
   
   const squareClasses = `square square-hover ${squareColor ? "light-grey" : ""} ${selected ? "selected" : ""}`
@@ -37,6 +37,13 @@ const isSquareSelected = (position, selectedPosition) => {
   return (position.col === selectedPosition.col && position.row === selectedPosition.row)
 }
 
+const mapStateToProps = (state, ownProps) => {
+  const id = ownProps.id
+  return {
+    square: state.game[id].game.board[ownProps.position.row][ownProps.position.col],
+    selectedPosition: state.game[id].game.selectedSquare
+  }
+}
 
 
 const mapDispatchToProps = (dispatch) => {
@@ -46,4 +53,4 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-export default connect(null, mapDispatchToProps)(Square)
+export default connect(mapStateToProps, mapDispatchToProps)(Square)

@@ -3,12 +3,10 @@ import { connect } from 'react-redux'
 
 
 const Timer = props => {
-  console.log(props)
   var time
   React.useEffect(
     () => {
       if (props.runTimer) {
-        console.log("in run timer")
         props.setTimerId(setInterval(counter, 1000))
         time = props.time
       } else {

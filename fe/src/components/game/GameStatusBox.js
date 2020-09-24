@@ -3,8 +3,7 @@ import { connect } from 'react-redux'
 import '../App.css'
 
 const GameStatusBox = props => {
-  
-  const fakeMoves = ['ke5', 'pxe6', 'Kh1']
+  console.log(props.moves)
   const moves = []
   var moveNumber = 1
   for (var i = 0; i < props.moves.length; i += 2) { //TODO fix indexes here
@@ -28,7 +27,12 @@ const GameStatusBox = props => {
   )
 }
 
+const mapStateToProps = (state, ownProps) => {
+  const id = ownProps.id
+  return {
+    moves: state.game[id].game.moveNotation
+  }
+}
 
 
-
-export default connect(null, null)(GameStatusBox)
+export default connect(mapStateToProps, null)(GameStatusBox)

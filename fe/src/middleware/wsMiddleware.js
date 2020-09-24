@@ -55,7 +55,6 @@ const socketMiddleware = () => {
 
   const onMessage = store => (event) => {
     const payload = JSON.parse(event.data)
-    console.log(payload)
     switch(payload.type) {
       case OPPONENT_MESSAGE: 
         store.dispatch(gameActions.addMessage(
@@ -69,8 +68,7 @@ const socketMiddleware = () => {
         //store.dispatch(gameActions.gameOver(false))
         break
       case LOAD_MOVES:
-        console.log("in load moves")
-        console.log(payload)
+
         store.dispatch(gameActions.loadMoves(payload.move_list, payload.game_id))
         store.dispatch(gameActions.updateBoard(payload.game_id))
         break
@@ -87,7 +85,6 @@ const socketMiddleware = () => {
         })
         break
       case INVITE_RECEIVED:
-        console.log(payload)
         const inviteFrom = payload.invite.from_user
         notify(`Invite from ${inviteFrom.name}`, payload.invite.message, {
           type: 'success',
@@ -107,6 +104,7 @@ const socketMiddleware = () => {
           type: "warning",
           animation: "slide"
         })
+        //TODO use load game instead here 
         store.dispatch(gameActions.startGame(payload.game, payload.me, payload.opponent))
 
         break

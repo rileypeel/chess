@@ -8,16 +8,9 @@ import { sendMove } from '../../actions/webSocket'
 import { move, selectSquare, unselectSquare } from '../../actions/game'
 
 const Board = props => {
-  const gameData = props.games[props.id]
-  const id = gameData.id
-  console.log("game data in board")
-  console.log(gameData)
-  if (!gameData) {
-    return <div></div>
-  }
+  const gameData = props.game
+  
   const onSquareClick = position => {
-      console.log("in click callback")
-      console.log(position)
       const tryToSelect = (square) => {
         if (square) {
           if (gameData.myColour === square.piece.colour)  {
@@ -31,8 +24,7 @@ const Board = props => {
       } else {
         
         if (gameData.myTurn) {
-          console.log(gameData)
-          console.log(gameData)
+  
           const pieceToMove = gameData.board[gameData.selectedSquare.row][gameData.selectedSquare.col]
           
           if (isPosIn(position, pieceToMove.moves)) { // seperate this into a seperate function
@@ -54,9 +46,8 @@ const Board = props => {
         key={`r${rowIndex}c${colIndex}`}
         position={{ col: colIndex, row: rowIndex }}
         onSquareClick={(position) => onSquareClick(position)}
-        board={gameData.board}
         myColour={gameData.myColour}
-        selectedPosition={gameData.selectedSquare}
+        id={props.id}
       />
     )
   )
@@ -72,9 +63,10 @@ const Board = props => {
   )
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
+  const id = ownProps.id
   return {
-    games: state.game
+    game: state.game[id].game
   }
 }
 

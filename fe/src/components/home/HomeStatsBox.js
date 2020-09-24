@@ -4,7 +4,6 @@ import { getGameHistory } from '../../actions/user'
 import '../App.css'
 
 const HomeStatsBox = props => {
-  console.log(props.userId)
   React.useEffect(() => {
     props.getHistory(props.userId)
   }, [props.userId]) //TODO something better here so we dont make api call until I have the userId

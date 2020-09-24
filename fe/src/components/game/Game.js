@@ -10,48 +10,36 @@ import '../App.css'
 
 
 const Game = props => {
-  const gameData = props.games[props.id]
-  const opponentData = gameData.opponent.user
   if (!props.gameStatus) {
-    
   }
-  console.log(gameData)
   return (
     <div className="game-view">
       <div className="board-column">
         <div style={{ marginBottom: "10px", alignItems: "center" }} className="flex-row opponent-label">
-          <UserLabel name={opponentData.name} rating={opponentData.rating}/>
+          <UserLabel name={props.opponent.user.name} rating={props.opponent.user.rating}/>
           <div style={{ marginLeft: "10px" }}></div>
         </div>
         <Board id={props.id}/>
         <div style={{ marginTop: "10px", alignItems: "center" }} className="flex-row my-label">
           <UserLabel name={props.me.name} rating={props.me.rating}/>
           <div style={{ marginLeft: "10px" }}>
-            <Timer
-              timerId={gameData.myTimerId}
-              setTimerId={props.setMyTimerId(props.id)}
-              time={gameData.myTime}
-              runTimer={gameData.myTurn}
-              setTime={props.setMyTime(props.id)}
-            />
+        
           </div>
         </div>
       </div>
       <div style={{ height: "fit-content" }} className="status-column grey-box-shadow">
-        <GameStatusBox moves={gameData.moveNotation}/>
-        <Chat me={props.me.name} opponent={opponentData.name} id={props.id} messages={gameData.messages}/>
-        
+        <GameStatusBox id={props.id}/>
+        <Chat me={props.me.name} id={props.id}/>
       </div>
     </div>
   )
 }
 
-
-
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
+  const id = ownProps.id
   return {
-    gameStatus: state.game.gameStatus,
-    games: state.game,
+    gameStatus: state.game[id].game.gameStatus,
+    opponent: state.game[id].game.opponent,
     me: state.user
   }
 }

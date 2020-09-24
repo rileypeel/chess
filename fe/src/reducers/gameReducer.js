@@ -117,7 +117,7 @@ const copyBoard = board => (
   board.map(
     row => row.map(
       square => (
-        square ? { piece: { ...square.piece }, moves: copyMoves(square.moves) } : null
+        square//square ? { piece: { ...square.piece }, moves: square.moves } : null
       )
     )
   )
@@ -164,18 +164,21 @@ const getInitialGameState = () => ({
 })
 
 function gameReducer(state = {}, action) {
-  const newState = copyState(state)
+  
   switch (action.type) {
     case actions.LOAD_GAME:
       if (!state[action.game.id]) {
-        const newGameObj = getInitialGameState()
-        newGameObj.status = action.game._status
-        newGameObj.myColour = action.me.colour
-        //newGameObj.myTime = action.me.time
-        newGameObj.opponent = { ...action.opponent, user: { ...action.opponent.user } }
-        newGameObj.id = action.game.id
-        newState[action.game.id] = newGameObj
-        return newState
+        const newGame = getInitialGameState()
+        newGame.status = action.game._status
+        newGame.myColour = action.me.colour
+        newGame.opponent = { ...action.opponent, user: { ...action.opponent.user } }
+        newGame.id = action.game.id
+        return { ...state,
+          [action.game.id]: {
+            game: newGame,
+            time: { myTime: action.me.time } //TODO
+          }
+        }
       }
       return state
 
@@ -186,96 +189,196 @@ function gameReducer(state = {}, action) {
           to: { row: moveItem.to[1], col: moveItem.to[0] }
         }
       })
-      newState[action.gameId].moveHistory = moves //TODO
-      return newState
-
-    case actions.START_GAME:
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            moveHistory: moves
+          }
+        }
+      }
+    case actions.START_GAME: //TODO refactor with load game
       if (!state[action.game.id]) {
-        const newGameObj = getInitialGameState()
-        newGameObj.status = action.game._status
-        newGameObj.myColour = action.me.colour
-        newGameObj.myTime = action.me.time
-        newGameObj.opponent = { ...action.opponent, user: { ...action.opponent.user } }
-        newGameObj.id = action.game.id
-        newState[action.game.id] = newGameObj
-        return newState
+        const newGame = getInitialGameState()
+        newGame.status = action.game._status
+        newGame.myColour = action.me.colour
+        newGame.opponent = { ...action.opponent, user: { ...action.opponent.user } }
+        newGame.id = action.game.id
+        return { ...state,
+          [action.game.id]: {
+            game: newGame,
+            time: { myTime: action.me.time } //TODO
+          }
+        }
       }
       return state
     
     case actions.SET_MY_TURN:
-      newState[action.gameId].myTurn = action.value
-      console.log(action.value)
-      return newState
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            myTurn: action.value
+          }
+        }
+      }
 
     case actions.SELECT_SQUARE:
-      newState[action.gameId].selectedSquare = {
-        col: action.position.col,
-        row: action.position.row
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            selectedSquare: {
+              col: action.position.col,
+              row: action.position.row
+            }
+          }
+        }
       }
-      return newState
     
     case actions.SET_COLOUR:
-      newState[action.gameId].myColour = action.colour
-      return newState
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            myColour: action.colour
+          }
+        }
+      }
 
     case actions.UNSELECT_SQUARE:
-      newState[action.gameId].selectedSquare = null
-      return newState
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            selectedSquare: null
+          }
+        }
+      }
 
     case actions.MOVE:
-      const squareToMove = newState[action.gameId].board[action.fromPos.row][action.fromPos.col] 
-      newState[action.gameId].board[action.toPos.row][action.toPos.col] = { piece: { ...squareToMove.piece }, moves: []}
-      newState[action.gameId].board[action.fromPos.row][action.fromPos.col] = null
-      return newState
+      console.log("in move")
+      const moveBoard = copyBoard(state[action.gameId].game.board)
+      const squareToMove = moveBoard[action.fromPos.row][action.fromPos.col] 
+      moveBoard[action.fromPos.row][action.fromPos.col] = null
+      moveBoard[action.toPos.row][action.toPos.col] = { piece: { ...squareToMove.piece }, moves: []}
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            board: moveBoard
+          }
+        }
+      }
      
     case actions.LOAD_VALID_MOVES:
-      const board = newState[action.gameId].board
+      const validMoveBoard = copyBoard(state[action.gameId].game.board)
       action.validMoves.forEach(item => {
-        board[item.position[1]][item.position[0]] = {
+        validMoveBoard[item.position[1]][item.position[0]] = {
+          ...state[action.gameId].game.board[item.position[1]][item.position[0]],
           moves: item.moves.map(
               move => (
                 { col: move[0], row: move[1] }
               )
             ),
-          piece: { ...board[item.position[1]][item.position[0]].piece }
           }
         }
       )
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            board: validMoveBoard
+          }
+        }
+      }
 
-      console.log(newState)
-      return newState
     case actions.UPDATE_BOARD:
-      const boardToUpdate = newState[action.gameId].board
-
-      newState[action.gameId].moveHistory.forEach(move => {
-        console.log("updating..")
-        console.log(move)
-        console.log(boardToUpdate)
+      const boardToUpdate = copyBoard(state[action.gameId].game.board)
+      state[action.gameId].game.moveHistory.forEach(move => {
         boardToUpdate[move.to.row][move.to.col] = {
-          piece: { ...boardToUpdate[move.from.row][move.from.col].piece },
+          ...boardToUpdate[move.from.row][move.from.col],
           moves: []
         }
         boardToUpdate[move.from.row][move.from.col] = null
       })
-      return newState
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            board: boardToUpdate
+          }
+        }
+      }
+
     case actions.GAME_END:
       return state //TODO
 
     case actions.ADD_MESSAGE:
-      console.log(action)
-      newState[action.gameId].messages.push({ ...action.message })
-      console.log(newState)
-      return newState
+      const newMessages = state[action.gameId].game.messages.map(message => (message))
+      newMessages.push({ ...action.message })
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            messages: newMessages
+          }
+        }
+      }
     case actions.ADD_NOTATION:
-      newState[action.gameId].moveNotation.push(action.notation)
-      return newState
+      const newNotation = state[action.gameId].game.moveNotation.map(message => (message))
+      newNotation.push(action.notation)
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            moveNotation: newNotation
+          }
+        }
+      }
     case actions.SET_MY_TIMER:
-      newState[action.gameId].timerId = action.timerId
-      return newState
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          time: {
+            ...state[action.gameId].time,
+            myTimerId: action.timerId
+          }
+        }
+      }
 
     case actions.SET_MY_TIME:
-      newState[action.gameId].time = action.time
-      return newState
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          time: {
+            ...state[action.gameId].time,
+            myTime: action.time
+          }
+        }
+      }
 
     default: 
       return state

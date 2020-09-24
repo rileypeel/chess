@@ -34,13 +34,11 @@ export const setHistory = response => ({ type: SET_HISTORY, ...response })
 export function getGameHistory(userId) {
   return dispatch => {
     return api.fetchGameHistory(userId).then(response => {
-      console.log(response)
       dispatch(setHistory(response))
     })
   }
 }
 export function fetchUser() {
-  console.log("attempting to fetch....")
   return dispatch => {
     return api.fetchUser()
       .then(response => {

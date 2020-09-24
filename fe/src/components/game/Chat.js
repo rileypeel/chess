@@ -8,10 +8,8 @@ import '../App.css'
 
 const Chat = props => {
 
-  console.log(props.messages)
   const keyPressed = (e) => {
     if (e.charCode == 13) {
-      console.log(props.id)
       props.addMessage({ sender: props.me, message: e.target.value }, props.id)
       props.sendMessage(e.target.value, props.id)
       e.target.value = ""
@@ -54,10 +52,11 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-const mapStateToProps = (state) => {
-
+const mapStateToProps = (state, ownProps) => {
+  const id = ownProps.id
   return {
+    messages: state.game[id].game.messages
   }
 }
 
-export default connect(null, mapDispatchToProps)(Chat)
+export default connect(mapStateToProps, mapDispatchToProps)(Chat)
