@@ -177,7 +177,7 @@ class Piece:
 
 class King(Piece):
     """Class for Kings, extends Piece"""
-    SYMBOL = 'Ki'
+    SYMBOL = 'K'
 
     def __init__(self, board, colour, position):
         """Override piece init, keep track of whether
@@ -321,7 +321,7 @@ class Queen(Rook, Bishop):
 
 class Knight(Piece):
     """Class for Knights, extends Piece"""
-    SYMBOL = 'Kn'
+    SYMBOL = 'N'
 
     @property
     def moves(self):
@@ -333,7 +333,7 @@ class Knight(Piece):
 
 class Pawn(Piece):
     """Class for Pawns extends Piece"""
-    SYMBOL = 'P'
+    SYMBOL = 'p'
 
     def __init__(self, board, colour, position):
         self.y_direction = (0, 1)

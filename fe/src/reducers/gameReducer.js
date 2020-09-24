@@ -109,8 +109,6 @@ export const UPDATE_GAME_STATUS = 'UPDATE_GAME_STATUS' d
 export const ADD_MESSAGE = 'ADD_MESSAGE'
 */
 
-
-
 // Helper functions for copying state 
 
 const copyMoves = moves => (moves.map(move => ({ ...move })))  
@@ -144,7 +142,7 @@ const copyState = state => {
     newState[key] = copyGame(state[key])
   }
   return newState
-} 
+}
 
 const getInitialGameState = () => ({
   connected: false,
@@ -158,13 +156,12 @@ const getInitialGameState = () => ({
   me: null,
   opponent: null,
   gameStatus: true,
-  moveNotation: []
+  moveNotation: [],
+  myTime: 1800,
+  myTimerId: null,
+  opponentTime: 1800,
+  opponentTimerId: null
 })
-
-const initialState = {
-  
-}
-
 
 function gameReducer(state = {}, action) {
   const newState = copyState(state)
@@ -174,7 +171,7 @@ function gameReducer(state = {}, action) {
         const newGameObj = getInitialGameState()
         newGameObj.status = action.game._status
         newGameObj.myColour = action.me.colour
-        newGameObj.myTime = action.me.time
+        //newGameObj.myTime = action.me.time
         newGameObj.opponent = { ...action.opponent, user: { ...action.opponent.user } }
         newGameObj.id = action.game.id
         newState[action.game.id] = newGameObj
@@ -206,7 +203,6 @@ function gameReducer(state = {}, action) {
       return state
     
     case actions.SET_MY_TURN:
-      console.log("setting turn")
       newState[action.gameId].myTurn = action.value
       console.log(action.value)
       return newState
@@ -273,6 +269,14 @@ function gameReducer(state = {}, action) {
     case actions.ADD_NOTATION:
       newState[action.gameId].moveNotation.push(action.notation)
       return newState
+    case actions.SET_MY_TIMER:
+      newState[action.gameId].timerId = action.timerId
+      return newState
+
+    case actions.SET_MY_TIME:
+      newState[action.gameId].time = action.time
+      return newState
+
     default: 
       return state
   }

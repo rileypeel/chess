@@ -395,7 +395,7 @@ class Move(models.Model):
         if self.move_type in (self.MoveType.REGULAR, self.MoveType.EN_PASSANT):
             if self.captured_piece_type:
                 return f"{self.piece_type}x{to_col}{to_row}"
-            return f"{self.piece_type}x{to_col}{to_row}"
+            return f"{self.piece_type}{to_col}{to_row}"
 
         if self.move_type is self.MoveType.CASTLE:
             return "0-0"

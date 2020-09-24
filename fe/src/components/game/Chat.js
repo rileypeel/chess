@@ -19,7 +19,7 @@ const Chat = props => {
   }
   const messageBox = React.createRef()
   const scrollToBottom = () => {
-    messageBox.current.scrollIntoView({ behaviour: "smooth"})
+    //messageBox.current.scrollIntoView({ behaviour: "smooth"}) BUG in here 
   }
   React.useEffect(scrollToBottom, [props.messages])
   const messageDisplay = props.messages.map(message => {

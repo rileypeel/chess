@@ -112,7 +112,7 @@ const socketMiddleware = () => {
         break
       case OPPONENT_MOVE:
         const move = payload.move
-        const moveNotation = payload.notation
+        const moveNotation = payload.move.notation
         const from = { col: move.from[0], row: move.from[1] }
         const to = { col: move.to[0], row: move.to[1] }
         store.dispatch(gameActions.move(from, to, payload.game_id))

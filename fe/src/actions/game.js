@@ -19,7 +19,11 @@ export const UPDATE_GAME_STATUS = 'UPDATE_GAME_STATUS'
 export const ADD_MESSAGE = 'ADD_MESSAGE'
 export const START_GAME = 'START_GAME'
 export const ADD_NOTATION = 'ADD_NOTATION'
+export const SET_MY_TIMER = 'SET_TIMER'
+export const SET_MY_TIME = 'SET_MY_TIME'
 
+export const setMyTime = (time, gameId) => ({ type: SET_MY_TIME, time, gameId })
+export const setMyTimerId = (timerId, gameId) => ({ type: SET_MY_TIMER, timerId, gameId })
 export const updateBoard = gameId => ({ type: UPDATE_BOARD, gameId })
 export const loadGame = (game, me, opponent) => ({ type: LOAD_GAME, game, me, opponent })
 export const setMyColour = (colour, gameId) => ({ type: SET_COLOUR, colour, gameId})

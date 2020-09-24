@@ -4,6 +4,8 @@ import Board from '../board/Board'
 import UserLabel from '../user/UserLabel'
 import Chat from './Chat'
 import GameStatusBox from './GameStatusBox'
+import { setMyTimerId, setMyTime } from '../../actions/game'
+import Timer from './Timer'
 import '../App.css'
 
 
@@ -19,12 +21,20 @@ const Game = props => {
       <div className="board-column">
         <div style={{ marginBottom: "10px", alignItems: "center" }} className="flex-row opponent-label">
           <UserLabel name={opponentData.name} rating={opponentData.rating}/>
-          <div style={{ marginLeft: "10px" }}><h3>30:00 </h3></div>
+          <div style={{ marginLeft: "10px" }}></div>
         </div>
         <Board id={props.id}/>
         <div style={{ marginTop: "10px", alignItems: "center" }} className="flex-row my-label">
           <UserLabel name={props.me.name} rating={props.me.rating}/>
-          <div style={{ marginLeft: "10px" }}><h3>30:00 </h3></div>
+          <div style={{ marginLeft: "10px" }}>
+            <Timer
+              timerId={gameData.myTimerId}
+              setTimerId={props.setMyTimerId(props.id)}
+              time={gameData.myTime}
+              runTimer={gameData.myTurn}
+              setTime={props.setMyTime(props.id)}
+            />
+          </div>
         </div>
       </div>
       <div style={{ height: "fit-content" }} className="status-column grey-box-shadow">
@@ -36,6 +46,8 @@ const Game = props => {
   )
 }
 
+
+
 const mapStateToProps = state => {
   return {
     gameStatus: state.game.gameStatus,
@@ -46,6 +58,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
+    setMyTimerId: gameId => timerId => dispatch(setMyTimerId(timerId, gameId)),
+    setMyTime: gameId => time => dispatch(setMyTime(time, gameId))
   }
 }
 
