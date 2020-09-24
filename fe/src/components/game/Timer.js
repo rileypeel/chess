@@ -1,25 +1,20 @@
 import React from 'react'
 import { connect } from 'react-redux'
-
+import { setTimerId, setTime } from '../../actions/game'
+import useInterval from '../../hooks/useInterval'
 
 const Timer = props => {
-  var time
-  React.useEffect(
-    () => {
-      if (props.runTimer) {
-        props.setTimerId(setInterval(counter, 1000))
-        time = props.time
-      } else {
-        clearInterval(props.timerId)
-      }
-    },
-    [props.runTimer]
-  )
+  console.log(props.timeRunning)
+
   
-  const counter = () => {
-    //props.setTime(props.time - 1)
-    time = time - 1
-  }
+  useInterval(() => {
+    props.setTime(props.time - 1, props.timeKey, props.id)
+  }, 1000, props.timeRunning)
+
+
+  
+  
+  
 
   const formatTime = time => {
     const seconds = time % 60
@@ -27,9 +22,24 @@ const Timer = props => {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
   }
   return (
-    <h3>{ formatTime(time) }</h3> 
+    <h3>{ formatTime(props.time) }</h3> 
   )
 
 }
+const mapStateToProps = (state, ownProps) => {
+  const id = ownProps.id
+  const timeKey = ownProps.timeKey
+  return {
+    time: state.game[id].time[timeKey].time,
+    timerId: state.game[id].time[timeKey].timerId
+  }
+}
 
-export default Timer
+const mapDispatchToProps = dispatch => {
+  return {
+    setTime: (time, timeKey, gameId) => dispatch(setTime(time, timeKey, gameId)),
+    setTimerId: (timerId, timeKey, gameId) => dispatch(setTimerId(timerId, timeKey, gameId))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Timer)

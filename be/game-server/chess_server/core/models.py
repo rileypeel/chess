@@ -339,12 +339,20 @@ class Player(models.Model):
             #    args=[self.game.id, self.id]
             #).start()
             self.turn_started_timestamp = decimal.Decimal(round(time.time(), 2) % 1800)
-            print("sending the start turn message")
             send(self.user.channel_name, consumer_cts.GAME_START_TURN, game_id=self.game.id)
         else:
-            self.time = decimal.Decimal(round(time.time(), 2) % 1800) - self.turn_started_timestamp
+            self.update_time()
             #self.turn_timer.cancel()
         self._turn = newValue
+
+    def update_time(self):
+        """
+        Helper method to update a player's time
+        """
+        if self._turn:
+            time_now = decimal.Decimal(round(time.time(), 2) % 1800)
+            self.time = self.time - time_now - self.turn_started_timestamp
+            self.turn_started_timestamp = time_now
 
 
 class Move(models.Model):

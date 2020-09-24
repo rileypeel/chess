@@ -100,6 +100,7 @@ CLIENT_TYPE_LOAD_MESSAGES = 'load_messages'
 CLIENT_TYPE_NEW_CHAT_MESSAGE = 'opponent_message'
 CLIENT_TYPE_OPPONENT_MOVE = 'opponent_move'
 CLIENT_TYPE_START_GAME = 'start_game'
+CLIENT_TYPE_UPDATE_TIME = 'update_time'
 CLIENT_TYPE = 'type'
 
 

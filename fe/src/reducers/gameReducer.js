@@ -157,10 +157,6 @@ const getInitialGameState = () => ({
   opponent: null,
   gameStatus: true,
   moveNotation: [],
-  myTime: 1800,
-  myTimerId: null,
-  opponentTime: 1800,
-  opponentTimerId: null
 })
 
 function gameReducer(state = {}, action) {
@@ -176,7 +172,7 @@ function gameReducer(state = {}, action) {
         return { ...state,
           [action.game.id]: {
             game: newGame,
-            time: { myTime: action.me.time } //TODO
+            time: { me: { time: 1800 } } //TODO
           }
         }
       }
@@ -209,7 +205,7 @@ function gameReducer(state = {}, action) {
         return { ...state,
           [action.game.id]: {
             game: newGame,
-            time: { myTime: action.me.time } //TODO
+            time: { me: { time: 1800 } } //TODO
           }
         }
       }
@@ -278,7 +274,8 @@ function gameReducer(state = {}, action) {
           ...state[action.gameId],
           game: {
             ...state[action.gameId].game,
-            board: moveBoard
+            board: moveBoard,
+            myTurn: false
           }
         }
       }
@@ -356,26 +353,26 @@ function gameReducer(state = {}, action) {
           }
         }
       }
-    case actions.SET_MY_TIMER:
+    case actions.SET_TIMER:
       return {
         ...state,
         [action.gameId]: {
           ...state[action.gameId],
           time: {
             ...state[action.gameId].time,
-            myTimerId: action.timerId
+            [action.timeKey]: { ...state[action.gameId].time[action.timeKey], timerId: action.timerId } 
           }
         }
       }
 
-    case actions.SET_MY_TIME:
+    case actions.SET_TIME:
       return {
         ...state,
         [action.gameId]: {
           ...state[action.gameId],
           time: {
             ...state[action.gameId].time,
-            myTime: action.time
+            [action.timeKey]: { ...state[action.gameId].time[action.timeKey], time: action.time } 
           }
         }
       }

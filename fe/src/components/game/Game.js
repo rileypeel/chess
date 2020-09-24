@@ -4,7 +4,6 @@ import Board from '../board/Board'
 import UserLabel from '../user/UserLabel'
 import Chat from './Chat'
 import GameStatusBox from './GameStatusBox'
-import { setMyTimerId, setMyTime } from '../../actions/game'
 import Timer from './Timer'
 import '../App.css'
 
@@ -23,7 +22,7 @@ const Game = props => {
         <div style={{ marginTop: "10px", alignItems: "center" }} className="flex-row my-label">
           <UserLabel name={props.me.name} rating={props.me.rating}/>
           <div style={{ marginLeft: "10px" }}>
-        
+            <Timer timeKey={'me'} id={props.id} timeRunning={props.myTurn}/>
           </div>
         </div>
       </div>
@@ -38,6 +37,7 @@ const Game = props => {
 const mapStateToProps = (state, ownProps) => {
   const id = ownProps.id
   return {
+    myTurn: state.game[id].game.myTurn,
     gameStatus: state.game[id].game.gameStatus,
     opponent: state.game[id].game.opponent,
     me: state.user
@@ -46,8 +46,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    setMyTimerId: gameId => timerId => dispatch(setMyTimerId(timerId, gameId)),
-    setMyTime: gameId => time => dispatch(setMyTime(time, gameId))
+    
   }
 }
 

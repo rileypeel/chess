@@ -314,7 +314,7 @@ class GameController:
             self.my_player.turn = False
             self.my_player.save()
             Move.objects.save_move(self.chess_engine.history[-1], self.game)
-            
+
             if self.chess_engine.status != IN_PROGRESS:
                 self.game.refresh_from_db()
                 self.game.status = self.chess_engine.status
@@ -372,6 +372,23 @@ class GameController:
         self.my_player.turn = True
         self.my_player.save()
         
+    def update_time(self, **kwargs):
+        """
+        Send down updated time to client
+        """
+        self.my_player.refresh_from_db()
+        self.my_player.update_time()
+        self.my_player.save()
+        
+        async_to_sync(get_channel_layer().send)(self.user.channel_name, {
+            constants.TYPE: constants.CLIENT_SEND,
+            constants.CONTENT: {
+                constants.CLIENT_TYPE: constants.CLIENT_TYPE_TIME_UPDATE,
+                constants.TIME: int(self.my_player.time),
+                constants.GAME_ID: str(self.game.id)   
+            }
+        })
+
     def status_update(self, **kwargs):
         """
         Fetch game results from DB and send over channel for 
