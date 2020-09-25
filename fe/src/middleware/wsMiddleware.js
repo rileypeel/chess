@@ -22,6 +22,7 @@ const INVITE_RECEIVED = 'invite_received'
 const INVITE_UPDATE = 'invite_update'
 const ERROR = 'client_error'
 const START_GAME = 'start_game'
+const UPDATE_TIME = 'update_time'
 //SENDER TYPES
 const SEND_MESSAGE = 'my_message'
 const MOVE = 'game_my_move'
@@ -29,6 +30,7 @@ const CHAT_MESSAGE = 'game_my_message'
 const ACCEPT_INVITE = 'invite_accepted'
 const INVITE_RESPONSE = 'invite_response'
 const MOVE_RESPONSE = 'move_response'
+const REQUEST_UPDATE_TIME = 'game_update_time'
 
 const formatMoves = piece => {
   const formattedMoves = piece.moves.map((move) => {
@@ -56,6 +58,11 @@ const socketMiddleware = () => {
   const onMessage = store => (event) => {
     const payload = JSON.parse(event.data)
     switch(payload.type) {
+
+      case UPDATE_TIME:
+        store.dispatch(gameActions.setTime(payload.opponent_time, 'opponent', payload.game_id))
+        store.dispatch(gameActions.setTime(payload.my_time, 'me', payload.game_id))
+        break
       case OPPONENT_MESSAGE: 
         store.dispatch(gameActions.addMessage(
           { sender: payload.message.user, message: payload.message.message },
@@ -98,6 +105,8 @@ const socketMiddleware = () => {
       case START_TURN:
         store.dispatch(gameActions.loadValidMoves(payload.valid_moves, payload.game_id))
         store.dispatch(gameActions.setMyTurn(true, payload.game_id))
+        store.dispatch(gameActions.setTime(payload.opponent_time, 'opponent', payload.game_id))
+        store.dispatch(gameActions.setTime(payload.my_time, 'me', payload.game_id))
         break
       case START_GAME:
         notify("Game Started", `Game with ${payload.opponent.name} has started`, {
@@ -144,6 +153,13 @@ return store => next => action => {
         socket.onmessage = onMessage(store)
         socket.onclose = onClose(store)
         socket.onopen = onOpen(store)
+        break
+
+      case actions.UPDATE_TIMES:
+        socket.send(JSON.stringify({
+          type: REQUEST_UPDATE_TIME,
+          game_id: action.gameId
+        }))
         break
       case actions.ACCEPT_INVITE:
         socket.send(JSON.stringify({

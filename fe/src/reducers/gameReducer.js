@@ -172,7 +172,10 @@ function gameReducer(state = {}, action) {
         return { ...state,
           [action.game.id]: {
             game: newGame,
-            time: { me: { time: 1800 } } //TODO
+            time: {
+              me: { time: action.me.time <= 0 ? 0 : action.me.time },
+              opponent: { time: action.opponent.time <= 0 ? 0 : action.opponent.time } 
+            }
           }
         }
       }
@@ -205,7 +208,10 @@ function gameReducer(state = {}, action) {
         return { ...state,
           [action.game.id]: {
             game: newGame,
-            time: { me: { time: 1800 } } //TODO
+            time: {
+              me: { time: action.me.time <= 0 ? 0 : action.me.time },
+              opponent: { time: action.opponent.time <= 0 ? 0 : action.opponent.time } 
+            } //TODO
           }
         }
       }
@@ -354,6 +360,7 @@ function gameReducer(state = {}, action) {
         }
       }
     case actions.SET_TIMER:
+
       return {
         ...state,
         [action.gameId]: {
@@ -366,6 +373,7 @@ function gameReducer(state = {}, action) {
       }
 
     case actions.SET_TIME:
+      if (action.time < 0) return state
       return {
         ...state,
         [action.gameId]: {

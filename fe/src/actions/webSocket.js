@@ -9,7 +9,7 @@ export const DISCONNECT_GAME_WS = 'DISCONNECT_GAME_WS'
 export const SEND_MOVE = 'SEND_MOVE'
 export const SEND_CHAT_MESSAGE = 'SEND_CHAT_MESSAGE'
 export const SEND_RESIGN = 'SEND_RESIGN'
-
+export const UPDATE_TIMES = 'UPDATE_TIMES'
 
 export const gameWSConnected = () => ({ type: GAME_WS_CONNECTED })
 export const sendMove = (from, to, gameId) => ({ type: SEND_MOVE, from, to, gameId })
@@ -19,3 +19,4 @@ export const disconnectWS = () => ({ type: DISCONNECT_WS })
 export const acceptGameInvite = inviteId => ({ type: ACCEPT_INVITE, inviteId })
 export const declineGameInvite = inviteId => ({ type: DECLINE_INVITE, inviteId })
 export const sendMessage = (message, gameId) => ({ type: SEND_CHAT_MESSAGE, gameId, message })
+export const updateTimes = gameId => ({ type: UPDATE_TIMES, gameId })

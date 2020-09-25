@@ -16,8 +16,9 @@ def game_timeout_callback(game_id, player_id):
     Callback to change game status when a players time
     runs out
     """
+    print("in the timeout callback")
     game = Game.objects.get(id=game_id)
-    game.status = GameStatus.TIMEOUT
+    game.status = Game.GameStatus.TIMEOUT
     player1, player2 = Player.objects.filter(game=game)
     winner_loser = (False, True)
     if player1.id == player_id:
@@ -280,9 +281,11 @@ class Game(models.Model):
         winning_colour = False
         if self.status == self.GameStatus.RESIGN:
             winning_colour = not self.resigned_colour
-        else:
-            winning_colour = Move.objects.filter(game=self).order_by(
-                '-move_number')[0].colour
+        else :
+            moves = Move.objects.filter(game=self).order_by(
+                '-move_number')
+            if moves:
+                winning_colour = moves[0].colour
 
         players = Player.objects.filter(game=self)
         player1, player2 = players[0], players[1]
@@ -316,12 +319,12 @@ class Player(models.Model):
     """Association object for many to many between players and game"""
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     game = models.ForeignKey('Game', on_delete=models.CASCADE)
-    time = models.DecimalField(default=1800.0, decimal_places=2, max_digits=6)
+    time = models.DecimalField(default=30.0, decimal_places=2, max_digits=6)
     _turn = models.BooleanField(default=False)
     colour = models.BooleanField()
     winner = models.BooleanField(default=False)
     loser = models.BooleanField(default=False)
-    turn_started_timestamp = models.DecimalField(null=True, decimal_places=2, max_digits=6)
+    turn_started_timestamp = models.DecimalField(null=True, decimal_places=2, max_digits=14)
 
     @property
     def turn(self):
@@ -333,16 +336,10 @@ class Player(models.Model):
         Set a timer when turn starts
         """
         if newValue:
-            #self.turn_timer = threading.Timer(
-            #    int(self.time),
-            #    game_timeout_callback,
-            #    args=[self.game.id, self.id]
-            #).start()
-            self.turn_started_timestamp = decimal.Decimal(round(time.time(), 2) % 1800)
+            self.turn_started_timestamp = decimal.Decimal(round(time.time(), 2))
             send(self.user.channel_name, consumer_cts.GAME_START_TURN, game_id=self.game.id)
         else:
             self.update_time()
-            #self.turn_timer.cancel()
         self._turn = newValue
 
     def update_time(self):
@@ -350,9 +347,12 @@ class Player(models.Model):
         Helper method to update a player's time
         """
         if self._turn:
-            time_now = decimal.Decimal(round(time.time(), 2) % 1800)
-            self.time = self.time - time_now - self.turn_started_timestamp
+            time_now = round(time.time(), 2)
+            self.time = round(self.time - decimal.Decimal(time_now) + self.turn_started_timestamp, 2)
             self.turn_started_timestamp = time_now
+            print("INMODEL")
+            print(time_now)
+            print(self.time)
 
 
 class Move(models.Model):

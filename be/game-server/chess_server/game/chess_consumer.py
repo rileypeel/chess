@@ -1,5 +1,4 @@
-import uuid, random
-import time
+import uuid, random, time, threading
 import game.constants as constants
 from chess.game import InvalidMoveError
 from chess.game import Game as ChessEngine
@@ -21,6 +20,23 @@ def parse_move(move_json):
     from_position = Position(move_json[constants.MOVE_FROM][0], move_json[constants.MOVE_FROM][1])
     to_position = Position(move_json[constants.MOVE_TO][0], move_json[constants.MOVE_TO][1])
     return (from_position, to_position)
+
+def game_timeout_callback(game_id, player_id):
+    """
+    Callback to change game status when a players time
+    runs out
+    """
+    print("in the timeout callback")
+    game = Game.objects.get(id=game_id)
+    game.status = Game.GameStatus.TIMEOUT
+    player1, player2 = Player.objects.filter(game=game)
+    winner_loser = (False, True)
+    if player1.id == player_id:
+        winner_loser = (True, False)
+    player1.winner, player2.winner = winner_loser
+    player1.save()
+    player2.save()
+    game.save()
 
 
 class ChessConsumer(JsonWebsocketConsumer):
@@ -271,12 +287,22 @@ class GameController:
         """
         Send down valid moves from chess engine to the client
         """
+        self.my_player.refresh_from_db()
+        self.opponent.refresh_from_db()
+        self.turn_timer = threading.Timer(
+           int(self.my_player.time),
+           game_timeout_callback,
+           args=[self.game.id, self.my_player.id]
+        )
+        self.turn_timer.start()
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
             constants.CONTENT: {
                 constants.TYPE: constants.CLIENT_TYPE_START_TURN,
                 constants.VALID_MOVES: self.chess_engine.format_moves(),
-                constants.GAME_ID: str(self.game.id)
+                constants.GAME_ID: str(self.game.id),
+                constants.MY_TIME: int(self.my_player.time),
+                constants.OPPONENT_TIME: int(self.opponent.time)
             }
         })
 
@@ -291,7 +317,6 @@ class GameController:
         )
         new_message.save()
         
-
     def my_move(self, **kwargs):
         """
         Update the chess engine with the clients move,
@@ -310,6 +335,7 @@ class GameController:
                 }
             })
         else:
+            self.turn_timer.cancel() #TODO careful here
             self.my_player.refresh_from_db()
             self.my_player.turn = False
             self.my_player.save()
@@ -376,15 +402,21 @@ class GameController:
         """
         Send down updated time to client
         """
+        print(f"initial times {int(self.my_player.time)}, {int(self.opponent.time)}")
         self.my_player.refresh_from_db()
         self.my_player.update_time()
         self.my_player.save()
+        self.opponent.refresh_from_db()
+        self.opponent.update_time()
+        self.opponent.save()
+        print(f"sending down times {int(self.my_player.time)}, {int(self.opponent.time)}")
         
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
             constants.CONTENT: {
-                constants.CLIENT_TYPE: constants.CLIENT_TYPE_TIME_UPDATE,
-                constants.TIME: int(self.my_player.time),
+                constants.CLIENT_TYPE: constants.CLIENT_TYPE_UPDATE_TIME,
+                constants.MY_TIME: int(self.my_player.time),
+                constants.OPPONENT_TIME: int(self.opponent.time),
                 constants.GAME_ID: str(self.game.id)   
             }
         })

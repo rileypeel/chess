@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { updateTimes } from '../../actions/webSocket'
 import Board from '../board/Board'
 import UserLabel from '../user/UserLabel'
 import Chat from './Chat'
@@ -11,12 +12,18 @@ import '../App.css'
 const Game = props => {
   if (!props.gameStatus) {
   }
+  React.useEffect(() => {
+    props.updateTimes(props.id)
+  }, [])
+
   return (
     <div className="game-view">
       <div className="board-column">
         <div style={{ marginBottom: "10px", alignItems: "center" }} className="flex-row opponent-label">
           <UserLabel name={props.opponent.user.name} rating={props.opponent.user.rating}/>
-          <div style={{ marginLeft: "10px" }}></div>
+          <div style={{ marginLeft: "10px" }}>
+          <Timer timeKey={'opponent'} id={props.id} timeRunning={!props.myTurn}/>
+          </div>
         </div>
         <Board id={props.id}/>
         <div style={{ marginTop: "10px", alignItems: "center" }} className="flex-row my-label">
@@ -46,7 +53,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    
+    updateTimes: gameId => dispatch(updateTimes(gameId))
   }
 }
 
