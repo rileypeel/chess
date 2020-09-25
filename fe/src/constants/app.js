@@ -17,7 +17,9 @@ export const USER = '/user'
 export const GAME = '/game'
 export const WS_HOST = 'ws://localhost:8000/chess-socket/'
 
-
+export const REGULAR = 'regular'
+export const EN_PASSANT = 'en_passant'
+export const CASTLE = 'castle'
 export const WHITE = true
 export const BLACK = false
 export const pieces = {

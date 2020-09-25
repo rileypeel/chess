@@ -405,9 +405,9 @@ class Move(models.Model):
                 return f"{self.piece_type}x{to_col}{to_row}"
             return f"{self.piece_type}{to_col}{to_row}"
 
-        if self.move_type is self.MoveType.CASTLE:
+        if self.move_type == self.MoveType.CASTLE:
             return "0-0"
-
+        return ""
 
     def save(self, *args, **kwargs):
         """

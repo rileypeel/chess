@@ -1,3 +1,5 @@
+import { EN_PASSANT, CASTLE, REGULAR } from '../constants/app'
+
 export const isPosEqual = (p1, p2) => {
   return p1.col === p2.col && p1.row === p2.row 
 }
@@ -12,7 +14,8 @@ export const isPosIn = (pos, posArray) => {
 } 
 
 export const isValidMove = (pieceToMove, position) => {
-  if (isPosIn(position, pieceToMove.moves)) return true
-  if (pieceToMove.passant && isPosEqual(pieceToMove.passant.to, position)) return true
-  if (pieceToMove.castle && isPosEqual(pieceToMove.castle.to, position)) return true
+  if (isPosIn(position, pieceToMove.moves)) return REGULAR
+  if (pieceToMove.passant && isPosEqual(pieceToMove.passant.to, position)) return EN_PASSANT
+  if (pieceToMove.castle && isPosEqual(pieceToMove.castle.to, position)) return CASTLE
+  return null
 }

@@ -219,8 +219,9 @@ class Game:
     def format_special_moves(self, piece):
         """Format for special moves"""
         formatted_special_moves = []
-        for move, move_info in self.valid_moves[piece][constants.SPECIAL_MOVES]:
-            if move[constants.TYPE] == constants.CASTLE:
+        for move in self.valid_moves[piece][constants.SPECIAL_MOVES].keys():
+            move_info = self.valid_moves[piece][constants.SPECIAL_MOVES][move]
+            if move_info[constants.TYPE] == constants.CASTLE:
                 formatted_castle = {
                     constants.TYPE: constants.CASTLE,
                     constants.ROOK_TO: move_info[constants.ROOK_TO].to_tuple(),
@@ -229,15 +230,15 @@ class Game:
                     constants.KING_TO: move
                 }
                 formatted_special_moves.append(formatted_castle)
-            elif move[constants.TYPE] == constants.EN_PASSANT:
+            elif move_info[constants.TYPE] == constants.EN_PASSANT:
                 formatted_passant = {
                     constants.TYPE: constants.EN_PASSANT,
                     constants.FROM: piece.position.to_tuple(),
                     constants.TO: move,
-                    constants.CAPTURE: move_info[constants.CAPTURE_PIECE].position.to_tuple()
+                    constants.CAPTURE_PIECE: move_info[constants.CAPTURE_PIECE].position.to_tuple()
                 }
                 formatted_special_moves.append(formatted_passant)
-            elif move[constants.TYPE] == constants.PAWN_PROMOTIOM:
+            elif move_info[constants.TYPE] == constants.PAWN_PROMOTIOM:
                 #TODO pass this for now
                 pass
             return formatted_special_moves

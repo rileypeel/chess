@@ -25,7 +25,7 @@ PAWN_PROMOTIOM = 'pawn_promotion'
 REGULAR = 'regular'
 ROOK = 'rook'
 ROOK_TO = 'rook_to'
-CAPTURE_PIECE = 'capture_piece'
+CAPTURE_PIECE = 'capture'
 
 # move record accessors
 COLOUR = 'colour'

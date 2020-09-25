@@ -4,6 +4,7 @@ import { loadGameInvites, saveInvite, setInviteSender } from '../actions/user'
 import { setAcceptModalOpen } from '../actions/ui'
 import * as gameActions from '../actions/game'
 import { notify } from '../services/notification'
+import { EN_PASSANT, CASTLE } from '../constants/app'
 //Bug list TODO
   // login response undefined error when login fails
 
@@ -33,8 +34,7 @@ const MOVE_RESPONSE = 'move_response'
 const REQUEST_UPDATE_TIME = 'game_update_time'
 
 //MOVE TYPES
-const PASSANT = 'en_passant'
-const CASTLE = 'castle'
+
 
 const formatMoves = piece => {
   const formattedMoves = piece.moves.map((move) => {
@@ -108,14 +108,15 @@ const socketMiddleware = () => {
         break
       case START_TURN:
         console.log(payload)
+        /*
         payload.special_moves.forEach(move => {
           if (move.type == CASTLE) {
-            dispatch(gameActions.addCastle(move, payload.game_id))
+            store.dispatch(gameActions.addCastle(move, payload.game_id))
           } else if (move.type == EN_PASSANT) {
-            dispatch(gameActions.addPassant(move, payload.game_id))
+            store.dispatch(gameActions.addPassant(move, payload.game_id))
           }
         })
-        
+        */
         store.dispatch(gameActions.loadValidMoves(payload.valid_moves, payload.game_id))
         store.dispatch(gameActions.setMyTurn(true, payload.game_id))
         store.dispatch(gameActions.setTime(payload.opponent_time, 'opponent', payload.game_id))
@@ -135,7 +136,18 @@ const socketMiddleware = () => {
         const moveNotation = payload.move.notation
         const from = { col: move.from[0], row: move.from[1] }
         const to = { col: move.to[0], row: move.to[1] }
-        store.dispatch(gameActions.move(from, to, payload.game_id))
+        store.dispatch(gameActions.movePiece(from, to, payload.game_id))
+        if (move.type == EN_PASSANT) {
+          store.dispatch(gameActions.removePiece({ col: move.to[0], row: move.from[1] }, payload.game_id))
+        } else if (move.type == CASTLE) {
+          store.dispatch(
+            gameActions.movePiece(
+              { row: move.from[1], col: move.to[0] == 1 ? 0 : 7 },
+              { row: move.to[1], col: move.to[0] == 1 ? 2 : 5},
+              payload.game_id
+            )
+          )
+        }
         store.dispatch(gameActions.addMoveNotation(moveNotation, payload.game_id))
         break
       case MOVE_RESPONSE:

@@ -1,7 +1,7 @@
 import * as actions from '../actions/game'
 import { setActiveItem } from '../actions/ui'
 
-import { pieces, BLACK, WHITE } from '../constants/app'
+import { pieces, BLACK, WHITE, EN_PASSANT, CASTLE } from '../constants/app'
 
 //helpers move these somewhere else
 /*
@@ -287,8 +287,27 @@ function gameReducer(state = {}, action) {
       }
      
     case actions.LOAD_VALID_MOVES:
+      console.log(action)
       const validMoveBoard = copyBoard(state[action.gameId].game.board)
       action.validMoves.forEach(item => {
+        var passant = null
+        var castle = null
+        if (item.special_moves) {
+          item.special_moves.forEach(specialItem => {
+            if (specialItem.type == EN_PASSANT) {
+              passant = {
+                to: { row: specialItem.to[1], col: specialItem.to[0] },
+                capture: { row: specialItem.capture[1], col: specialItem.capture[0] }
+              } 
+            } else if (specialItem.type == CASTLE) {
+              castle = {
+                to: { row: specialItem.to[1], col: specialItem.to[0] },
+                rookTo: { row: specialItem.rook_to[1], col: specialItem.rook_to[0] },
+                rookFrom: { row: specialItem.rook_from[1], col: specialItem.rook_from[0] }
+              } 
+            }
+          })
+        }
         validMoveBoard[item.position[1]][item.position[0]] = {
           ...state[action.gameId].game.board[item.position[1]][item.position[0]],
           moves: item.moves.map(
@@ -296,7 +315,10 @@ function gameReducer(state = {}, action) {
                 { col: move[0], row: move[1] }
               )
             ),
+            passant, 
+            castle
           }
+          
         }
       )
       return {
@@ -397,44 +419,7 @@ function gameReducer(state = {}, action) {
           }
         }
       }
-    case actions.ADD_PASSANT:
-      const passantBoard = copyBoard(state[action.gameId].game.board)
-      passantBoard[action.from[1]][action.from[0]] = {
-        ...passantBoard[action.from[1]][action.from[0]],
-        passant: {
-          to: { row: action.to[1], col: action.to[0] },
-          capture: { row: action.capture[1], col: action.capture[0] } } 
-      } 
-      return {
-        ...state,
-        [action.gameId]: {
-          ...state[action.gameId],
-          game: {
-            ...state[action.gameId].game,
-            board: passantBoard
-          }
-        }
-      }
-    case actions.ADD_CASTLE:
-      const castleBoard = copyBoard(state[action.gameId].game.board)
-      castleBoard[action.from[1]][action.from[0]] = {
-        ...castleBoard[action.from[1]][action.from[0]],
-        castle: {
-          to: { row: action.to[1], col: action.to[0] },
-          rookTo: { row: action.rookTo[1], col: action.rookTo[0] },
-          rookFrom: { row: action.rookFrom[1], col: action.rookFrom[0] }
-        } 
-      }
-      return {
-        ...state,
-        [action.gameId]: {
-          ...state[action.gameId],
-          game: {
-            ...state[action.gameId].game,
-            board: castleBoard
-          }
-        }
-      }
+
     default: 
       return state
   }
