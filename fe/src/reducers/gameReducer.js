@@ -384,7 +384,57 @@ function gameReducer(state = {}, action) {
           }
         }
       }
-
+    case actions.REMOVE_PIECE:
+      const removeBoard = copyBoard(state[action.gameId].game.board)
+      removeBoard[action.position.row][action.position.col] = null
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            board: removeBoard
+          }
+        }
+      }
+    case actions.ADD_PASSANT:
+      const passantBoard = copyBoard(state[action.gameId].game.board)
+      passantBoard[action.from[1]][action.from[0]] = {
+        ...passantBoard[action.from[1]][action.from[0]],
+        passant: {
+          to: { row: action.to[1], col: action.to[0] },
+          capture: { row: action.capture[1], col: action.capture[0] } } 
+      } 
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            board: passantBoard
+          }
+        }
+      }
+    case actions.ADD_CASTLE:
+      const castleBoard = copyBoard(state[action.gameId].game.board)
+      castleBoard[action.from[1]][action.from[0]] = {
+        ...castleBoard[action.from[1]][action.from[0]],
+        castle: {
+          to: { row: action.to[1], col: action.to[0] },
+          rookTo: { row: action.rookTo[1], col: action.rookTo[0] },
+          rookFrom: { row: action.rookFrom[1], col: action.rookFrom[0] }
+        } 
+      }
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            board: castleBoard
+          }
+        }
+      }
     default: 
       return state
   }

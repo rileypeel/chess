@@ -231,7 +231,7 @@ class Game:
                 formatted_special_moves.append(formatted_castle)
             elif move[constants.TYPE] == constants.EN_PASSANT:
                 formatted_passant = {
-                    constants.type: constants.EN_PASSANT,
+                    constants.TYPE: constants.EN_PASSANT,
                     constants.FROM: piece.position.to_tuple(),
                     constants.TO: move,
                     constants.CAPTURE: move_info[constants.CAPTURE_PIECE].position.to_tuple()

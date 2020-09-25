@@ -319,7 +319,7 @@ class Player(models.Model):
     """Association object for many to many between players and game"""
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     game = models.ForeignKey('Game', on_delete=models.CASCADE)
-    time = models.DecimalField(default=30.0, decimal_places=2, max_digits=6)
+    time = models.DecimalField(default=1800.0, decimal_places=2, max_digits=6)
     _turn = models.BooleanField(default=False)
     colour = models.BooleanField()
     winner = models.BooleanField(default=False)

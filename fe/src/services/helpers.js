@@ -10,4 +10,9 @@ export const isPosIn = (pos, posArray) => {
   }
   return false
 } 
-  
+
+export const isValidMove = (pieceToMove, position) => {
+  if (isPosIn(position, pieceToMove.moves)) return true
+  if (pieceToMove.passant && isPosEqual(pieceToMove.passant.to, position)) return true
+  if (pieceToMove.castle && isPosEqual(pieceToMove.castle.to, position)) return true
+}

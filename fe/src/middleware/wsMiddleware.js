@@ -32,6 +32,10 @@ const INVITE_RESPONSE = 'invite_response'
 const MOVE_RESPONSE = 'move_response'
 const REQUEST_UPDATE_TIME = 'game_update_time'
 
+//MOVE TYPES
+const PASSANT = 'en_passant'
+const CASTLE = 'castle'
+
 const formatMoves = piece => {
   const formattedMoves = piece.moves.map((move) => {
     return { col: move[0], row: move[1] }
@@ -103,6 +107,15 @@ const socketMiddleware = () => {
       case ERROR:
         break
       case START_TURN:
+        console.log(payload)
+        payload.special_moves.forEach(move => {
+          if (move.type == CASTLE) {
+            dispatch(gameActions.addCastle(move, payload.game_id))
+          } else if (move.type == EN_PASSANT) {
+            dispatch(gameActions.addPassant(move, payload.game_id))
+          }
+        })
+        
         store.dispatch(gameActions.loadValidMoves(payload.valid_moves, payload.game_id))
         store.dispatch(gameActions.setMyTurn(true, payload.game_id))
         store.dispatch(gameActions.setTime(payload.opponent_time, 'opponent', payload.game_id))

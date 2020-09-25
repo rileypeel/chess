@@ -300,6 +300,7 @@ class GameController:
             constants.CONTENT: {
                 constants.TYPE: constants.CLIENT_TYPE_START_TURN,
                 constants.VALID_MOVES: self.chess_engine.format_moves(),
+                constants.SPECIAL_MOVES: self.chess_engine.format_special_moves(),
                 constants.GAME_ID: str(self.game.id),
                 constants.MY_TIME: int(self.my_player.time),
                 constants.OPPONENT_TIME: int(self.opponent.time)

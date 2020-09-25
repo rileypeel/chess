@@ -21,6 +21,8 @@ export const START_GAME = 'START_GAME'
 export const ADD_NOTATION = 'ADD_NOTATION'
 export const SET_TIMER = 'SET_TIMER'
 export const SET_TIME = 'SET_TIME'
+export const ADD_CASTLE = 'ADD_CASTLE'
+export const ADD_PASSANT = 'ADD_PASSANT'
 
 export const setTime = (time, timeKey, gameId) => ({ type: SET_TIME, time, timeKey, gameId })
 export const setTimerId = (timerId, timeKey, gameId) => ({ type: SET_TIMER, timerId, timeKey, gameId })
@@ -29,7 +31,7 @@ export const loadGame = (game, me, opponent) => ({ type: LOAD_GAME, game, me, op
 export const setMyColour = (colour, gameId) => ({ type: SET_COLOUR, colour, gameId})
 //export const setGameId = (gameId) => ({ type: SET_GAME_ID, gameId }) //TODO dump?
 export const selectSquare = (position, gameId) => ({ type: SELECT_SQUARE, position, gameId })
-export const move = (fromPos, toPos, gameId) => ({ type: MOVE, fromPos, toPos, gameId })
+export const movePiece = (fromPos, toPos, gameId) => ({ type: MOVE, fromPos, toPos, gameId })
 export const setMyTurn = (value, gameId) => ({ type: SET_MY_TURN, value, gameId })
 export const unselectSquare = gameId => ({ type: UNSELECT_SQUARE, gameId })
 export const loadValidMoves = (validMoves, gameId) => ({ type: LOAD_VALID_MOVES, validMoves, gameId })
@@ -38,3 +40,16 @@ export const updateGameStatus = (status, gameId) => ({ type: UPDATE_GAME_STATUS,
 export const addMessage = (message, gameId) => ({ type: ADD_MESSAGE, message, gameId })
 export const startGame = (game, me, opponent) => ({ type: START_GAME, game, me, opponent })
 export const addMoveNotation = (notation, gameId) => ({ type: ADD_NOTATION, notation, gameId })
+export const addCastle = (move, gameId) => ({ type: ADD_CASTLE, move, gameId })
+export const addPassant = (move, gameId) => ({ type: ADD_PASSANT, move, gameId })
+
+export const move = (pieceToMove, fromPos, toPos, moveType, gameId) => {
+  return dispatch => {
+    if (moveType == CASTLE) {
+      dispatch(movePiece(pieceToMove.castle.rookFrom, pieceToMove.castle.rookTo, gameId))
+    } else if (moveType == EN_PASSANT) {
+      dispatch(removePiece(pieceToMove.passant.capture))
+    } 
+    dispatch(movePiece(fromPos, toPos, gameId))
+  }
+}

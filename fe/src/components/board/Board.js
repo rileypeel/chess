@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { isValidElement } from 'react'
 import { connect } from 'react-redux'
 import Square from './Square'
 import '../App.css'
 import { WHITE } from '../../constants/app'
-import { isPosIn } from '../../services/helpers'
+import { isValid } from '../../services/helpers'
 import { sendMove } from '../../actions/webSocket'
-import { move, selectSquare, unselectSquare } from '../../actions/game'
+import { movePiece, selectSquare, unselectSquare } from '../../actions/game'
 
 const Board = props => {
   const gameData = props.game
@@ -27,8 +27,8 @@ const Board = props => {
   
           const pieceToMove = gameData.board[gameData.selectedSquare.row][gameData.selectedSquare.col]
           
-          if (isPosIn(position, pieceToMove.moves)) { // seperate this into a seperate function
-            
+          //if (isPosIn(position, pieceToMove.moves)) { // seperate this into a seperate function
+          if (isValid(pieceToMove, position)) {  
             props.move(gameData.selectedSquare, position, props.id)
             props.sendMove(gameData.selectedSquare, position, props.id)
             props.unselect(props.id)
