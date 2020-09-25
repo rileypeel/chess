@@ -1,5 +1,5 @@
 # chess
-chess for gentlemen scholars
+chess
 
 
 # bugs
