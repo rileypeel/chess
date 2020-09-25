@@ -4,7 +4,6 @@ import { setTimerId, setTime } from '../../actions/game'
 import useInterval from '../../hooks/useInterval'
 
 const Timer = props => {
-  console.log(props)
   
   var run = props.timeRunning
   if (props.time <= 0) {

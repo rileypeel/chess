@@ -435,7 +435,8 @@ class GameController:
                 constants.CLIENT_TYPE: constants.CLIENT_TYPE_STATUS_UPDATE,
                 constants.CLIENT_STATUS: self.game.status,
                 constants.CLIENT_WINNER: self.my_player.winner,
-                constants.CLIENT_LOSER: self.my_player.loser     
+                constants.CLIENT_LOSER: self.my_player.loser,
+                constants.GAME_ID: str(self.game.id)     
             }
         })
 

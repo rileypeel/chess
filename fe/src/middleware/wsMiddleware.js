@@ -75,7 +75,14 @@ const socketMiddleware = () => {
         //dispatch action to push message
         break
       case GAME_STATUS_UPDATE:
-        //dispatch some sort of end of game action
+        console.log("game status has been updated")
+        console.log(payload)
+        store.dispatch(gameActions.setMyTurn(false, payload.game_id))
+        
+        notify(payload.status, payload.winner ? 'You won!' : 'You lost, better luck next time', {
+          type: payload.winner ? 'success' : 'danger',
+          container: 'center'
+        })
         //store.dispatch(gameActions.gameOver(false))
         break
       case LOAD_MOVES:

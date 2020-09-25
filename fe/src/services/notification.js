@@ -17,14 +17,14 @@ const getAnimationOut = (type) => {
 }
 
 export const notify = (title, message, extraArgs) => {
-  const { type = "success", animation = "fade", duration = 5000, onRemoval = null} = extraArgs
+  const { container = "top-right", type = "success", animation = "fade", duration = 5000, onRemoval = null} = extraArgs
   store.addNotification({
     title,
     message,
     type,
     onRemoval,
     insert: "top",
-    container: "top-right",
+    container,
     animationIn: ["animate__animated", getAnimationIn(animation)],
     animationOut: ["animate__animated", getAnimationOut(animation)],
     dismiss: {
