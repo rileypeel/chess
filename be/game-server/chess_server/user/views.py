@@ -9,7 +9,8 @@ from asgiref.sync import async_to_sync
 from user.serializers import UserSerializer, AuthTokenSerializer, GameInviteWriteSerializer
 from game.serializers import GameSerializer
 from core.models import User, GameInvite, Game
-import json
+from django.db.utils import IntegrityError
+import json, random
 
 class CreateUserView(generics.CreateAPIView):
     """Create a new user in the system"""
@@ -96,3 +97,25 @@ class GameHistory(APIView):
         games
         serializer = GameSerializer(games, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+class CreateGuest(APIView):
+    """
+    Endpoint for creating a guest account
+    """
+    def get(self, request):
+        while True:
+            random_num = random.randint(0, 10000)
+            try:
+                guest_user = User.objects.create(
+                    is_guest=True,
+                    name=f"Guest{random_num}",
+                    email=f"fakeemail{random_num}@email.ca",
+                    password="fakepassword123"
+                )
+            except IntegrityError as ex:
+                print(f"Integrity Error: {ex}")
+            else:
+                break
+        serializer = UserSerializer(guest_user)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+                
