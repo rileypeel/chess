@@ -1,6 +1,7 @@
 import { EN_PASSANT, CASTLE, REGULAR } from '../constants/app'
 
 export const isPosEqual = (p1, p2) => {
+  if (!p1 || !p2) return false
   return p1.col === p2.col && p1.row === p2.row 
 }
   

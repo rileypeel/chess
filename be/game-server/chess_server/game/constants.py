@@ -30,6 +30,7 @@ CLIENT_SEND = 'send.message'
 
 # client message types
 CLIENT_TYPE_ERROR = 'client_error' 
+CLIENT_TYPE_LOAD_BOARD = 'load_board'
 CLIENT_TYPE_INVITE_UPDATE = 'invite_update'
 CLIENT_TYPE_INVITE_RECEIVED = 'invite_received'
 CLIENT_TYPE_INVITE_ACCEPTED = 'invite_accepted'
@@ -75,3 +76,4 @@ WINS = 'wins'
 GAMES_PLAYED = 'games_played'
 WINNER = 'winner'
 USER_ID = 'user_id'
+BOARD = 'board'

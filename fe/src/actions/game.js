@@ -19,7 +19,9 @@ export const SET_TIME = 'SET_TIME'
 export const ADD_CASTLE = 'ADD_CASTLE'
 export const ADD_PASSANT = 'ADD_PASSANT'
 export const REMOVE_PIECE = 'REMOVE_PIECE'
+export const LOAD_BOARD = 'LOAD_BOARD'
 
+export const loadBoard = (board, gameId) => ({ type: LOAD_BOARD, board, gameId })
 export const removePiece = (position, gameId) => ({ type: REMOVE_PIECE, position, gameId })
 export const setTime = (time, timeKey, gameId) => ({ type: SET_TIME, time, timeKey, gameId })
 export const setTimerId = (timerId, timeKey, gameId) => ({ type: SET_TIMER, timerId, timeKey, gameId })

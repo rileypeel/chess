@@ -146,8 +146,12 @@ class Board:
     def format_board(self):
         """Return the board representation in the natural way, 
         as a 2d list of pieces"""
-        board = [[0 for i in range(8)] for j in range(8)] # coordinate with frontend
         pieces = self.all_pieces()
+        board = []
         for piece in pieces:
-            board[piece.position.y][piece.position.x] = str(piece)
+            board.append({
+                'position': piece.position.to_tuple(),
+                'type': piece.SYMBOL,
+                'colour': piece.colour
+            })
         return board

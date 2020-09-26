@@ -1,4 +1,5 @@
 import * as actions from '../actions/game'
+import * as constants from '../constants/app'
 import { pieces, BLACK, WHITE, EN_PASSANT, CASTLE } from '../constants/app'
 
 const startingBoard = () => {
@@ -48,6 +49,25 @@ const startingBoard = () => {
   return board
 }
 
+const getBoard = boardData => {
+  const board = []
+  for (var i = 0; i < 8; i++) {
+    board.push([null, null, null, null, null, null, null, null])
+  }
+  
+  boardData.forEach(pieceData => {
+    console.log(pieceData.position)
+    board[pieceData.position[1]][pieceData.position[0]] = {
+      piece: {
+        ...constants.pieceBySymbol[pieceData.type][pieceData.colour],
+      },
+      moves: []
+    }
+  })
+  console.log(board)
+  return board
+}
+
 const copyBoard = board => (
   board.map(
     row => row.map(
@@ -86,8 +106,8 @@ function gameReducer(state = {}, action) {
           [action.game.id]: {
             game: newGame,
             time: {
-              me: { time: action.me.time <= 0 ? 0 : action.me.time },
-              opponent: { time: action.opponent.time <= 0 ? 0 : action.opponent.time } 
+              me: { time: action.me.time <= 0 ? 0 : Math.trunc(action.me.time) },
+              opponent: { time: action.opponent.time <= 0 ? 0 : Math.trunc(action.opponent.time) } 
             }
           }
         }
@@ -95,7 +115,18 @@ function gameReducer(state = {}, action) {
       return state
 
     case actions.LOAD_BOARD:
-      return state
+      console.log(action)
+      const newBoard = getBoard(action.board)
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            board: newBoard
+          }
+        }
+      }
 
     case actions.LOAD_MOVES:
       const moves = action.moves.map((moveItem) => {
@@ -114,25 +145,6 @@ function gameReducer(state = {}, action) {
           }
         }
       }
-
-    case actions.START_GAME: 
-      if (!state[action.game.id]) {
-        const newGame = getInitialGameState()
-        newGame.status = action.game._status
-        newGame.myColour = action.me.colour
-        newGame.opponent = { ...action.opponent, user: { ...action.opponent.user } }
-        newGame.id = action.game.id
-        return { ...state,
-          [action.game.id]: {
-            game: newGame,
-            time: {
-              me: { time: action.me.time <= 0 ? 0 : action.me.time },
-              opponent: { time: action.opponent.time <= 0 ? 0 : action.opponent.time } 
-            } 
-          }
-        }
-      }
-      return state
     
     case actions.SET_MY_TURN:
       return {
@@ -193,7 +205,7 @@ function gameReducer(state = {}, action) {
       if (squareToMove.piece.type == 'pawn'){
         if (action.toPos.row == 0 || action.toPos.row == 7) {
           moveBoard[action.toPos.row][action.toPos.col] = {
-            piece: { ...constants.whiteQueen, colour: squareToMove.piece.colour },
+            piece: { ...constants.pieceBySymbol['Q'][squareToMove.piece.colour] },
             moves: []
           }
         }
@@ -251,26 +263,6 @@ function gameReducer(state = {}, action) {
           game: {
             ...state[action.gameId].game,
             board: validMoveBoard
-          }
-        }
-      }
-
-    case actions.UPDATE_BOARD:
-      const boardToUpdate = copyBoard(state[action.gameId].game.board)
-      state[action.gameId].game.moveHistory.forEach(move => {
-        boardToUpdate[move.to.row][move.to.col] = {
-          ...boardToUpdate[move.from.row][move.from.col],
-          moves: []
-        }
-        boardToUpdate[move.from.row][move.from.col] = null
-      })
-      return {
-        ...state,
-        [action.gameId]: {
-          ...state[action.gameId],
-          game: {
-            ...state[action.gameId].game,
-            board: boardToUpdate
           }
         }
       }

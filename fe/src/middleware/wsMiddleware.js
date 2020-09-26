@@ -35,6 +35,9 @@ const socketMiddleware = () => {
           )
         )
         break
+      case constants.LOAD_BOARD:
+        store.dispatch(gameActions.loadBoard(payload.board, payload.game_id))
+        break
       case constants.OPPONENT_MESSAGE: 
         store.dispatch(
           gameActions.addMessage(
@@ -56,7 +59,6 @@ const socketMiddleware = () => {
         break
       case constants.LOAD_MOVES:
         store.dispatch(gameActions.loadMoves(payload.move_list, payload.game_id))
-        store.dispatch(gameActions.updateBoard(payload.game_id))
         break
       case constants.LOAD_GAME:
         store.dispatch(gameActions.loadGame(payload.game, payload.me, payload.opponent))
@@ -92,23 +94,23 @@ const socketMiddleware = () => {
         store.dispatch(gameActions.setMyTurn(true, payload.game_id))
         store.dispatch(
           gameActions.setTime(
-            payload.opponent_time, 
+            Math.trunc(payload.opponent_time), 
             'opponent',
             payload.game_id
           )
         )
-        store.dispatch(gameActions.setTime(payload.my_time, 'me', payload.game_id))
+        store.dispatch(gameActions.setTime(Math.trunc(payload.my_time), 'me', payload.game_id))
         break
       case constants.START_GAME:
         notify(
           'Game Started',
-          `Game with ${payload.opponent.name} has started`, {
+          `Game with ${payload.opponent.user.name} has started`, {
             type: 'warning',
             animation: 'slide'
           }
         )
         store.dispatch(setGoToGame(payload.game.id))
-        store.dispatch(gameActions.startGame(payload.game, payload.me, payload.opponent))
+        store.dispatch(gameActions.loadGame(payload.game, payload.me, payload.opponent))
         break
       case constants.OPPONENT_MOVE:
         const move = payload.move
@@ -116,14 +118,14 @@ const socketMiddleware = () => {
         const from = { col: move.from[0], row: move.from[1] }
         const to = { col: move.to[0], row: move.to[1] }
         store.dispatch(gameActions.movePiece(from, to, payload.game_id))
-        if (move.type == EN_PASSANT) {
+        if (move.type == constants.EN_PASSANT) {
           store.dispatch(
             gameActions.removePiece(
               { col: move.to[0], row: move.from[1] },
               payload.game_id
               )
             )
-        } else if (move.type == CASTLE) {
+        } else if (move.type == constants.CASTLE) {
           store.dispatch(
             gameActions.movePiece(
               { row: move.from[1], col: move.to[0] == 1 ? 0 : 7 },
@@ -201,7 +203,7 @@ return store => next => action => {
           game_id: action.gameId 
         }))
         break
-        
+
       case actions.SEND_RESIGN:
         break
       default:

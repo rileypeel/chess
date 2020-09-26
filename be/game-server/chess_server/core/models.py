@@ -261,7 +261,7 @@ class Game(models.Model):
         updates ratings
         """
         winning_colour = False
-        player1, player2 = self.game_to_user[0], self.game_to_user[1]
+        player1, player2 = Player.objects.filter(game=self)
         winner_loser = (True, False)
         if new_status == self.GameStatus.RESIGN:
             if player1.resigned:
@@ -311,7 +311,7 @@ class Player(models.Model):
     """Association object for many to many between players and game"""
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='user_to_game')
     game = models.ForeignKey('Game', on_delete=models.CASCADE, related_name='game_to_user')
-    time = models.DecimalField(default=1800.0, decimal_places=2, max_digits=6)
+    time = models.DecimalField(default=180.0, decimal_places=2, max_digits=6)
     _turn = models.BooleanField(default=False)
     colour = models.BooleanField()
     winner = models.BooleanField(default=False)
@@ -342,10 +342,12 @@ class Player(models.Model):
         Helper method to update a player's time
         """
         if self._turn:
+            self.refresh_from_db()
             time_now = round(time.time(), 2)
             self.time = round(self.time - decimal.Decimal(time_now) + self.turn_started_timestamp, 2)
             self.turn_started_timestamp = time_now
-
+            if self.time < 0:
+                self.time = 0
 
 class Move(models.Model):
     """Model for a move made in a game"""
@@ -360,7 +362,6 @@ class Move(models.Model):
     class MoveType(models.TextChoices):
         CASTLE = chess.constants.CASTLE
         EN_PASSANT = chess.constants.EN_PASSANT
-        #TODO maybe??? PAWN_PROMOTION = 'PP'
         REGULAR = chess.constants.REGULAR
 
     objects = MoveManager()

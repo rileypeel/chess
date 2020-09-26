@@ -26,16 +26,29 @@ def game_timeout_callback(game_id, player_id):
     Callback to change game status when a players time
     runs out
     """
+
     game = Game.objects.get(id=game_id)
-    players = game.game_to_user
+    players = Player.objects.filter(game=game)
     if players[0].id == player_id:
+        print(f"{players[0].user.name} has timed out")
         players[0].timeout = True
         players[0].save()
     if players[1].id == player_id:
+        print(f"{players[1].user.name} has timed out")
         players[1].timeout = True
         players[1].save()
     game.status = Game.GameStatus.TIMEOUT
 
+def cancel_timeout(game_id, player_id):
+    """
+    Helper func to get timer thread for a player and cancel it
+    """
+    for th in threading.enumerate():
+        if isinstance(th, threading.Timer):
+            if (getattr(th, 'game_id', None) == game_id
+                and getattr(th, 'player_id', None) == player_id):
+                print("timeout cancelled")
+                th.cancel()
 
 class ChessConsumer(JsonWebsocketConsumer):
 
@@ -54,17 +67,14 @@ class ChessConsumer(JsonWebsocketConsumer):
         Create game controllers for all active games and 
         load game history into chess engines
         """
-        print("loading games") #TODO fix this thing
-        players = Player.objects.filter(user=self.scope['user'])
-        for p in players: #TODO this needs testing
-            try:
-                game = Game.objects.get(game_to_user=p, _status=Game.GameStatus.IN_PROGRESS)
-            except Game.DoesNotExist:
-                print("game not found ")
-            else:
-                game_controller = GameController(game, self.scope['user'], new_game=False)
-                game_controller.load_game()
-                self.game_controllers.append(game_controller)
+        games = Game.objects.filter(
+            game_to_user__user=self.scope['user'],
+            _status=Game.GameStatus.IN_PROGRESS
+        )
+        for game in games: 
+            game_controller = GameController(game, self.scope['user'], new_game=False)
+            game_controller.load_game()
+            self.game_controllers.append(game_controller)
 
     def disconnect(self, code):
         """
@@ -180,23 +190,29 @@ class GameController:
         if new_game:
             self.start_game()
 
-    def start_game(self, **kwargs):
+    def send_game(self, message_type):
         """
-        Handle start of the game, send down start game message 
-        to the client
-        """    
+        Send down a start game message to client
+        """
         serializer = serializers.GameSerializer(self.game)
         my_player_serializer = serializers.PlayerSerializer(self.my_player)
         opponent_serializer = serializers.PlayerSerializer(self.opponent)
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
             constants.CONTENT: {
-                constants.TYPE: constants.CLIENT_TYPE_START_GAME,
+                constants.TYPE: message_type,
                 constants.GAME: serializer.data,
                 constants.ME: my_player_serializer.data,
                 constants.OPPONENT: opponent_serializer.data
             }
         })
+
+    def start_game(self, **kwargs):
+        """
+        Handle start of the game, send down start game message 
+        to the client
+        """    
+        self.send_game(constants.CLIENT_TYPE_START_GAME)
         if self.my_player.colour is WHITE:
             self.my_player.turn = True
             self.my_player.save()
@@ -205,20 +221,26 @@ class GameController:
         """
         Send game details down to client
         """
-        serializer = serializers.GameSerializer(self.game)
-        my_player_serializer = serializers.PlayerSerializer(self.my_player)
-        opponent_serializer = serializers.PlayerSerializer(self.opponent)
+        self.send_game(constants.CLIENT_TYPE_LOAD_GAME)
+        self.load_moves()
+        self.load_board()
+        self.load_messages()
+        if self.my_player.turn:
+            cancel_timeout(self.game.id, self.my_player.id)
+            self.start_turn()
+
+    def load_board(self, **kwargs):
+        """
+        Send down the positions of pieces on board to client
+        """
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
             constants.CONTENT: {
-                constants.TYPE: constants.CLIENT_TYPE_LOAD_GAME,
-                constants.GAME: serializer.data,
-                constants.ME: my_player_serializer.data,
-                constants.OPPONENT: opponent_serializer.data
+                constants.TYPE: constants.CLIENT_TYPE_LOAD_BOARD,
+                constants.BOARD: self.chess_engine.board.format_board(),
+                constants.GAME_ID: str(self.game.id)
             }
         })
-        self.load_moves()
-        self.load_messages()
 
     def load_moves(self, **kwargs):
         """
@@ -265,6 +287,10 @@ class GameController:
         """
         Send down valid moves from chess engine to the client
         """
+        self.my_player.update_time()
+        self.opponent.update_time()
+        self.my_player.save()
+        self.opponent.save()
         self.my_player.refresh_from_db()
         self.opponent.refresh_from_db()
         self.turn_timer = threading.Timer(
@@ -272,6 +298,9 @@ class GameController:
            game_timeout_callback,
            args=[self.game.id, self.my_player.id]
         )
+        self.turn_timer.game_id = self.game.id
+        self.turn_timer.player_id = self.my_player.id
+        print(f"timer thread set for {self.my_player.user.name} for {int(self.my_player.time)}")
         self.turn_timer.start()
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
@@ -313,7 +342,8 @@ class GameController:
                 }
             })
         else:
-            self.turn_timer.cancel() #TODO careful here
+            print(f"timer cancelled for {self.my_player.user.name}")
+            self.turn_timer.cancel()
             self.my_player.refresh_from_db()
             self.my_player.turn = False
             self.my_player.save()
