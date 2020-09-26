@@ -46,7 +46,6 @@ export const move = (pieceToMove, fromPos, toPos, moveType, gameId) => {
     } else if (moveType == EN_PASSANT) {
       dispatch(removePiece(pieceToMove.passant.capture, gameId))
     } 
-    console.log(gameId)
     dispatch(movePiece(fromPos, toPos, gameId))
   }
 }

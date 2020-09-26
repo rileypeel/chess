@@ -94,6 +94,9 @@ function gameReducer(state = {}, action) {
       }
       return state
 
+    case actions.LOAD_BOARD:
+      return state
+
     case actions.LOAD_MOVES:
       const moves = action.moves.map((moveItem) => {
         return {
@@ -187,6 +190,14 @@ function gameReducer(state = {}, action) {
       const squareToMove = moveBoard[action.fromPos.row][action.fromPos.col] 
       moveBoard[action.fromPos.row][action.fromPos.col] = null
       moveBoard[action.toPos.row][action.toPos.col] = { piece: { ...squareToMove.piece }, moves: []}
+      if (squareToMove.piece.type == 'pawn'){
+        if (action.toPos.row == 0 || action.toPos.row == 7) {
+          moveBoard[action.toPos.row][action.toPos.col] = {
+            piece: { ...constants.whiteQueen, colour: squareToMove.piece.colour },
+            moves: []
+          }
+        }
+      }
       return {
         ...state,
         [action.gameId]: {
@@ -333,7 +344,7 @@ function gameReducer(state = {}, action) {
           }
         }
       }
-
+  
     default: 
       return state
   }
