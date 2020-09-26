@@ -9,24 +9,6 @@ import chess.piece
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
-# USEFUL for querying through the many to many field: Game.objects.filter(player__user=tom)
-
-def game_timeout_callback(game_id, player_id):
-    """
-    Callback to change game status when a players time
-    runs out
-    """
-    print("in the timeout callback")
-    game = Game.objects.get(id=game_id)
-    game.status = Game.GameStatus.TIMEOUT
-    player1, player2 = Player.objects.filter(game=game)
-    winner_loser = (False, True)
-    if player1.id == player_id:
-        winner_loser = (True, False)
-    player1.winner, player2.winner = winner_loser
-    player1.save()
-    player2.save()
-    game.save()
 
 def send(channel_name, message_type, game_id=None, model_id=None):
     """
@@ -80,6 +62,7 @@ def get_opponent_channel_colour(my_colour, game):
     if player1.colour is my_colour:
         return player2.user.channel_name
     return player1.user.channel_name
+
 
 class UserManager(BaseUserManager):
     """Custom User Manager"""
@@ -216,6 +199,7 @@ class GameInvite(models.Model):
         if callback:
             callback[constants.FUNCTION](*callback[constants.ARGS], **callback[constants.KWARGS])
 
+
 class Game(models.Model):
     """Model for a Game"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -349,9 +333,6 @@ class Player(models.Model):
             time_now = round(time.time(), 2)
             self.time = round(self.time - decimal.Decimal(time_now) + self.turn_started_timestamp, 2)
             self.turn_started_timestamp = time_now
-            print("INMODEL")
-            print(time_now)
-            print(self.time)
 
 
 class Move(models.Model):
@@ -412,7 +393,6 @@ class Move(models.Model):
         """
         Override save to observe when a move is created
         """
-
         if self._state.adding:
             self.notation = self.get_notation()
             super(*args, **kwargs).save()
@@ -420,6 +400,7 @@ class Move(models.Model):
             send(opponent_channel, consumer_cts.GAME_OPPONENT_MOVE, model_id=self.id, game_id=self.game.id)
         else:
             super(*args, **kwargs).save()
+
 
 class ChatMessage(models.Model):
     """
@@ -436,8 +417,6 @@ class ChatMessage(models.Model):
         """
         if self._state.adding:
             super().save(*args, **kwargs)
-            print(f"{self.user} saved a message")
-
             send(
                 get_opponent_channel_user(self.user, self.game),
                 consumer_cts.GAME_OPPONENT_MESSAGE,

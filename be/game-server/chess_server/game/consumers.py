@@ -26,7 +26,6 @@ def game_timeout_callback(game_id, player_id):
     Callback to change game status when a players time
     runs out
     """
-    print("in the timeout callback")
     game = Game.objects.get(id=game_id)
     game.status = Game.GameStatus.TIMEOUT
     player1, player2 = Player.objects.filter(game=game)
@@ -48,25 +47,6 @@ class ChessConsumer(JsonWebsocketConsumer):
         self.channel_layer = get_channel_layer()
         self.scope['user'].online = True #TODO check to make sure not anon user
         self.scope['user'].channel_name = self.channel_name #TODO maybe pass this down to controllers instead
-        self.scope['user'].save()
-        self.load_active_games()
-
-    def login_user(self, user_id): #TODO get rid of this 
-        """
-        A method to login user into the scope, would like to get rid of this
-        at some point and somehow inject user into the scope if
-        already on the request object. 
-        """
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            print(f"Error: user with id: {user_id} not found.")
-            self.send_message({
-                constants.CLIENT_TYPE: constants.CLIENT_AUTH_ERROR
-            })
-        async_to_sync(login)(self.scope, user)
-        
-        self.scope['user'].online = True
         self.scope['user'].save()
         self.load_active_games()
     
@@ -109,7 +89,6 @@ class ChessConsumer(JsonWebsocketConsumer):
         """
         Dispatches the message to the controller to handle it 
         """
-        print(f"here is the message {message}")
         type_str = message[constants.TYPE]
         if type_str == constants.WS_LOGIN:
             self.login_user(message[constants.USER_ID])
@@ -137,7 +116,6 @@ class ChessConsumer(JsonWebsocketConsumer):
             func = getattr(game_controller, subtype_str)
 
         if controller_type == constants.CONTROLLER_TYPE_INVITE:
-            print(f"here is the name of the method to be called {subtype_str}")
             func = getattr(self.invite_controller, subtype_str)
 
         func(**message)
@@ -156,23 +134,20 @@ class ChessConsumer(JsonWebsocketConsumer):
 
     def single_message(self, message):
         """
-        Dispacth message to correct handling function
+        Dispatch message to correct handling function
         """
-        print("hitting consumer")
         self.chess_dispatch(message[constants.CONTENT])
 
     def send_message(self, message):
         """
         Send down json message to the client
         """
-        print(message[constants.CONTENT])
         self.send_json(message[constants.CONTENT])
 
     def add_game(self, message):
         """
         Instantiate new Game controller with the game passed
         """
-        print("in add game")
         game_id = message[constants.GAME_ID]
         try:
             game = Game.objects.get(id=game_id)
@@ -243,7 +218,6 @@ class GameController:
         Load moves from db into chess_engine and send each 
         move down to client
         """
-        print("loading moves...")
         moves = Move.objects.filter(game=self.game).order_by('move_number')
         move_list = []
         for m in moves:
@@ -263,14 +237,11 @@ class GameController:
             } 
         })
 
-        print("finished loading moves")
-
     def load_messages(self, **kwargs):
         """
         Load all chat messages from the db, 
         and send down to client
         """
-        
         messages = ChatMessage.objects.filter(game=self.game)
         if not messages:
             return
@@ -351,7 +322,6 @@ class GameController:
         """
         Retrieve last message from DB and send down to client
         """
-        print(self.user)
         message_id = kwargs.get(constants.ID, None)
         try:
             new_message = ChatMessage.objects.get(id=message_id)
@@ -372,7 +342,6 @@ class GameController:
         Update chess_engine with the opponents move
         Send valid moves over the channel
         """
-        print(self.user)
         move_id = kwargs.get(constants.ID, None)
         try:
             last_move = Move.objects.get(id=move_id)
@@ -403,15 +372,12 @@ class GameController:
         """
         Send down updated time to client
         """
-        print(f"initial times {int(self.my_player.time)}, {int(self.opponent.time)}")
         self.my_player.refresh_from_db()
         self.my_player.update_time()
         self.my_player.save()
         self.opponent.refresh_from_db()
         self.opponent.update_time()
         self.opponent.save()
-        print(f"sending down times {int(self.my_player.time)}, {int(self.opponent.time)}")
-        
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
             constants.CONTENT: {
@@ -484,9 +450,7 @@ class InviteController:
         response = kwargs.get(constants.ACCEPTED)
         if response:
             invite.accepted = True
-            print("accepting invite....")
         else:
-            print("declining invite...")
             invite.declined = True
         invite.save()
 
@@ -494,7 +458,6 @@ class InviteController:
         """
         Send invite update over channel layer for client
         """
-        print("in update invite")
         invite_id = kwargs.get(constants.ID)
         try:
             invite = GameInvite.objects.get(id=invite_id)

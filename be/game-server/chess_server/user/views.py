@@ -7,10 +7,12 @@ from django.contrib.auth import authenticate, login, get_user_model
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from user.serializers import UserSerializer, AuthTokenSerializer, GameInviteWriteSerializer
-from game.serializers import GameSerializer, TestGameSerializer
+from game.serializers import GameSerializer, GameSerializerPlayer
 from core.models import User, GameInvite, Game
 from django.db.utils import IntegrityError
+from game.constants import RESULTS, WINS, GAMES_PLAYED
 import json, random
+
 
 class CreateUserView(generics.CreateAPIView):
     """Create a new user in the system"""
@@ -52,7 +54,7 @@ class CreateGameInvite(APIView):
 
 class LoginView(APIView):
     """View for user login"""
-    #permission_classes = (permissions.AllowAny)
+
     def post(self, request):
         email = request.data.get('email', None)
         password = request.data.get('password', None)
@@ -99,8 +101,8 @@ class GameHistory(APIView):
         )
         games_played = finished_games.count()
         num_won_games = finished_games.filter(game_to_user__winner=True).count()
-        serializer = TestGameSerializer(finished_games.order_by('date_played')[0:10], many=True)
-        data = { 'results': serializer.data, 'wins': num_won_games,  'games_played': games_played }
+        serializer = GameSerializerPlayer(finished_games.order_by('date_played')[0:10], many=True)
+        data = { RESULTS: serializer.data, WINS: num_won_games,  GAMES_PLAYED: games_played }
         return Response(data=data, status=status.HTTP_200_OK)
 
 class CreateGuest(APIView):

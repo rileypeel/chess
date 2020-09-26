@@ -2,8 +2,6 @@ from django.urls import path
 from rest_framework.routers import SimpleRouter
 from user import views
 
-
-
 app_name = 'user'
 
 urlpatterns = [

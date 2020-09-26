@@ -22,11 +22,10 @@ class PlayerSerializer(ModelSerializer):
 
 class GameSerializer(ModelSerializer):
     """Serializer for Game Model"""
-    #moves = MoveSerializer(many=True, read_only=True)
     class Meta:
         model = Game
         fields = '__all__'
-        #exclude = ('moves',)
+
 
 class ChatMessageSerializer(ModelSerializer):
     """
@@ -38,9 +37,9 @@ class ChatMessageSerializer(ModelSerializer):
         model = ChatMessage
         fields = '__all__'
 
-class TestGameSerializer(ModelSerializer):
+
+class GameSerializerPlayer(ModelSerializer):
     game_to_user = PlayerSerializer(many=True)
-    
     class Meta:
         model = Game
         fields = '__all__'
