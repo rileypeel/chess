@@ -1,6 +1,5 @@
 import * as actions from '../actions/webSocket'
 
-
 const initialState = {
   connected: false,
 }

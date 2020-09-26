@@ -36,3 +36,33 @@ export const pieces = {
   blackKing: { type: 'king', symbol: 'Ki', image: blackKingImg, colour: BLACK },
   blackQueen: { type: 'queen', symbol: 'Q', image: blackQueenImg, colour: BLACK }
 }
+
+// WS receive message types
+const START_TURN = 'start_turn'
+const LOAD_GAME = 'load_game'
+const LOAD_MOVES = 'load_moves'
+const LOAD_MESSAGES = 'load_messages'
+const OPPONENT_MESSAGE = 'opponent_message'
+const OPPONENT_MOVE = 'opponent_move'
+const GAME_STATUS_UPDATE = 'status_update'
+const INVITE_RECEIVED = 'invite_received'
+const INVITE_UPDATE = 'invite_update'
+const ERROR = 'client_error'
+const START_GAME = 'start_game'
+const UPDATE_TIME = 'update_time'
+
+//WS send message type
+const SEND_MESSAGE = 'my_message'
+const MOVE = 'game_my_move'
+const CHAT_MESSAGE = 'game_my_message'
+const ACCEPT_INVITE = 'invite_accepted'
+const INVITE_RESPONSE = 'invite_response'
+const MOVE_RESPONSE = 'move_response'
+const REQUEST_UPDATE_TIME = 'game_update_time'
+
+//notification removed by
+const CLICK = 'click'
+
+//timer keys 
+const OPPONENT = 'opponent'
+const ME = 'me'

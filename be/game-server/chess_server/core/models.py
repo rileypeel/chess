@@ -316,8 +316,8 @@ class Game(models.Model):
 
 class Player(models.Model):
     """Association object for many to many between players and game"""
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
-    game = models.ForeignKey('Game', on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='user_to_game')
+    game = models.ForeignKey('Game', on_delete=models.CASCADE, related_name='game_to_user')
     time = models.DecimalField(default=1800.0, decimal_places=2, max_digits=6)
     _turn = models.BooleanField(default=False)
     colour = models.BooleanField()

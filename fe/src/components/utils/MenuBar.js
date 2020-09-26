@@ -6,8 +6,6 @@ import { Link } from 'react-router-dom'
 import { HOME, LOGIN, USER, GAME } from '../../constants/app'
 import '../App.css'
 
-
-//TODO dispatch a logout 
 const MenuBar = (props) => {
   return (
     <div className="menu">
@@ -36,7 +34,6 @@ const MenuBar = (props) => {
           />
         </Menu.Menu>
       </Menu>
-    
     </div>
   )
 }
@@ -48,12 +45,10 @@ const mapStateToProps = (state) => {
 } 
 
 const mapDispatchToProps = (dispatch) => {
-  
   return {
     itemClick: (event, menuItem) => { 
       return dispatch(setActiveItem(menuItem.name))
     }
-
   }
 }
 

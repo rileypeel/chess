@@ -9,15 +9,9 @@ const Timer = props => {
   if (props.time <= 0) {
     run = false
   } 
-  
   useInterval(() => {
     props.setTime(props.time - 1, props.timeKey, props.id)
   }, 1000, run)
-
-
-  
-  
-  
 
   const formatTime = time => {
     const seconds = time % 60
@@ -25,9 +19,8 @@ const Timer = props => {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
   }
   return (
-    <h3>{ formatTime(props.time) }</h3> 
+    <h3>{formatTime(props.time)}</h3> 
   )
-
 }
 const mapStateToProps = (state, ownProps) => {
   const id = ownProps.id

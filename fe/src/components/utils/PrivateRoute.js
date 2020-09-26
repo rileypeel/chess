@@ -5,11 +5,9 @@ import { fetchUser } from '../../actions/user'
 import { LOGIN } from '../../constants/app'
 
 const PrivateRoute = ({ children, getUser, fetchComplete, isAuthenticated, ...rest }) => {
-
   React.useEffect(() => { 
     getUser()
   }, []) 
-
   return (
     <Route
       { ...rest }
@@ -35,7 +33,7 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     isAuthenticated: state.user.isAuthenticated,
     fetchComplete: state.user.attemptedFetch

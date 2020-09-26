@@ -9,21 +9,16 @@ function useInterval(callback, delay, runTimer) {
   }, [callback])
 
   // Set up the interval.
-  useEffect((test) => {
+  useEffect(() => {
     function tick() {
       savedCallback.current()
     }
-    console.log(test)
     if (runTimer) {
       intervalId.current = setInterval(tick, delay)
-      console.log("should go when turn starts once")
     } else {
-      console.log("should go when turn ends once")
       clearInterval(intervalId.current)
     }
   }, [runTimer])
-
-  
 }
 
 export default useInterval

@@ -7,7 +7,6 @@ import UserLabel from '../user/UserLabel'
 import '../App.css'
 
 const InviteModal = props => {
-
   const send = () => {
     const invite = {
       to_user: props.selectedUser.id,
@@ -15,6 +14,13 @@ const InviteModal = props => {
       message: props.message
     }
     props.sendInvite(invite)
+    props.setMessage('')
+    props.setOpen(false)
+  }
+
+  const cancel = () => {
+    props.setOpen(false)
+    props.setMessage('')
   }
   const name = props.selectedUser ? props.selectedUser.name : ''
   return ( 
@@ -23,7 +29,9 @@ const InviteModal = props => {
       onOpen={() => props.setOpen(true)}
       open={props.open}
     >
-      <Modal.Header style={{ textAlign: 'center', width: 'auto' }}>Send Invite</Modal.Header>
+      <Modal.Header style={{ textAlign: 'center', width: 'auto' }}>
+        Send Invite
+      </Modal.Header>
       <Modal.Content>
         <Modal.Description>
         </Modal.Description>
@@ -31,11 +39,16 @@ const InviteModal = props => {
           To: <UserLabel style={{width: "auto"}} rating={1200} name={name}/>
         </div>
         <Form>
-          <Form.Field control={TextArea} onChange={(event) => props.setMessage(event.target.value)} value={props.message} placeholder="Message...." />
+          <Form.Field
+            control={TextArea}
+            onChange={(event) => props.setMessage(event.target.value)}
+            value={props.message}
+            placeholder="Message...."
+          />
         </Form>
       </Modal.Content>
       <Modal.Actions>
-        <Button color='black' onClick={() => props.setOpen(false)}>
+        <Button color='black' onClick={cancel}>
           Cancel
         </Button>
         <Button

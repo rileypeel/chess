@@ -1,11 +1,5 @@
 import { CASTLE, EN_PASSANT } from '../constants/app'
-/** 
- * action types
- */
 
-// Game actions
-//export const SET_GAME_ID = 'SET_GAME_ID'
-//export const SELECT_PIECE = 'SELECT_PIECE'
 export const UNSELECT_SQUARE = 'UNSELECT_SQUARE' 
 export const MOVE = 'MOVE'
 export const SELECT_SQUARE = 'SELECT_SQUARE'

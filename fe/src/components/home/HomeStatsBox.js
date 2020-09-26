@@ -1,44 +1,48 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { getGameHistory } from '../../actions/user'
+import { Loader } from 'semantic-ui-react'
 import '../App.css'
 
 const HomeStatsBox = props => {
   React.useEffect(() => {
-    props.getHistory(props.userId)
-  }, [props.userId]) //TODO something better here so we dont make api call until I have the userId
+    if (props.userId) {
+      props.getHistory(props.userId)
+    }
+  }, [props.userId])
 
-  const fakeGames = [{ opponent: 'guy', winner: true }, { opponent: 'girl', winner: false }]
-
-  var totalWins = 0
-  const gamesPlayed = fakeGames.length
-  
-
-  const results = fakeGames.map(
+  const results = props.gameHistory && props.gameHistory.map(
     gameResult => {
-      if (gameResult.winner) totalWins++
       return (<div className="flex-row" style={{ justifyContent: "space-between", margin: "5px" }}>
         <div>
-          { gameResult.winner ? 'Win' : 'Loss' }
+          { gameResult.won ? 'Win' : 'Loss' }
         </div>
         <div>
           Game Vs. { gameResult.opponent }
         </div>
       </div>
-    )}
+      )
+    }
   )
-
   return (
     <div className="stats-box grey-box-shadow">
-      <h3>Wins: { totalWins } Losses: { gamesPlayed - totalWins }</h3>
-      { results }
+      {props.gameHistory ? (
+        <div>
+          <h3>Wins: {props.wins} Losses: {props.gamesPlayed - props.wins}</h3>
+          {results}
+        </div>
+      ) : (<Loader inline={'centered'} active/>) 
+      }
     </div>
   )
 }
 
 const mapStateToProps = state => {
   return {
-    userId: state.user.id
+    userId: state.user.id,
+    gameHistory: state.user.gameHistory,
+    wins: state.user.totalWins,
+    gamesPlayed: state.user.totalGames
   }
 }
 

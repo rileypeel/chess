@@ -79,7 +79,7 @@ class ChessConsumer(JsonWebsocketConsumer):
         players = Player.objects.filter(user=self.scope['user'])
         for p in players: #TODO this needs testing
             try:
-                game = Game.objects.get(player=p, _status=Game.GameStatus.IN_PROGRESS)
+                game = Game.objects.get(game_to_user=p, _status=Game.GameStatus.IN_PROGRESS)
             except Game.DoesNotExist:
                 print("game not found ")
             else:

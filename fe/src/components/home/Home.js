@@ -4,8 +4,18 @@ import GameInvite from '../invite/GameInvite'
 import UserLabel from '../user/UserLabel'
 import HomeStatsBox from './HomeStatsBox'
 import '../App.css' 
+import { setGoToGame } from '../../actions/ui'
+import { useHistory } from 'react-router-dom'
+import { GAME } from '../../constants/app'
 
 const Home = props => {
+  const history = useHistory()
+  React.useEffect(() => {
+    if (props.goToGame) {
+      props.setGoToGame(false)
+      history.push(GAME)
+    }
+  }, [props.goToGame])
   return (
     <div className="home-view">
       <div className="home-margin-top invite-column">
@@ -25,9 +35,15 @@ const Home = props => {
 const mapStateToProps = (state) => {
   return {
     name: state.user.name,
-    rating: state.user.rating
+    rating: state.user.rating,
+    goToGame: state.ui.goToGame
   }
 }
 
+const mapDispatchToProps = dispatch => {
+  return {
+    setGoToGame: value => dispatch(setGoToGame(value))
+  }
+}
 
-export default connect(mapStateToProps, null)(Home)
+export default connect(mapStateToProps, mapDispatchToProps)(Home)

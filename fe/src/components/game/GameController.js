@@ -1,13 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
-import { setActiveTab } from '../../actions/ui'
 import '../App.css'
 import Game from './Game'
 
-
 const GameController = props => {
-
   const panes = Object.keys(props.games).map(key => {
     const opponentName = props.games[key].game.opponent.user.name
     const gameId = key.substring(0, 3)
@@ -16,29 +13,15 @@ const GameController = props => {
       render: () => <Game id={key}/>
     }
   })
-
-
-
-  return panes ?
+  return panes.length > 0 ?
     <Tab
       menu={{ secondary: true }}
       panes={panes} 
       /> 
     : 
-    <div>{ "No active games." }</div>
+    <div style={{ position: 'absolute', height: '50%', width: '50%' }}>{'No active games.'}</div>
 }
 
-const mapStateToProps = state => {
-  return {
-    games: state.game
-    //activeTab: state.ui.activeTab
-  }
-}
+const mapStateToProps = state => ({ games: state.game })
 
-const mapDispatchToProps = dispatch => {
-  return {
-    //setTab: value => dispatch(setActiveTab(value))
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(GameController)
+export default connect(mapStateToProps, null)(GameController)

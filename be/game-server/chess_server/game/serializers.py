@@ -37,3 +37,10 @@ class ChatMessageSerializer(ModelSerializer):
     class Meta:
         model = ChatMessage
         fields = '__all__'
+
+class TestGameSerializer(ModelSerializer):
+    game_to_user = PlayerSerializer(many=True)
+    
+    class Meta:
+        model = Game
+        fields = '__all__'

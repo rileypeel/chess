@@ -6,7 +6,6 @@ import { acceptGameInvite, declineGameInvite } from '../../actions/webSocket'
 import '../App.css'
 
 const AcceptModal = props => {
-
   const acceptClicked = () => {
     props.accept(props.inviteData.id)
     props.setOpen(false)
@@ -45,10 +44,8 @@ const mapStateToProps = state => {
     open: state.ui.acceptModalOpen,
     inviteData: state.user.wsInvite,
     fromUser: state.user.inviteSender
-
   }
 }
-
 const mapDispatchToProps = dispatch => {
   return {
     setOpen: value => dispatch(setAcceptModalOpen(value)),

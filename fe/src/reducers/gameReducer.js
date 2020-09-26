@@ -1,148 +1,62 @@
 import * as actions from '../actions/game'
-import { setActiveItem } from '../actions/ui'
-
 import { pieces, BLACK, WHITE, EN_PASSANT, CASTLE } from '../constants/app'
-
-//helpers move these somewhere else
-/*
-const isPosEqual = (p1, p2) => {
-  
-  if (p1.length != p2.length) {
-    return false
-  }
-  for (var i = 0;i < p1.length; i++) {
-    if (p1[i] != p2[i]) {
-      return false
-    }
-  }
-  return true
-}
-
-const isPosIn = (pos, posArray) => {
-
-  for (var i = 0; i < posArray.length; i++) {
-    if (isPosEqual(pos, posArray[i])) {
-      return true
-    }
-  }
-  return false
-}
-*/
-// move format = { from: { col: 0, row: 0 }, to: { col: 0, row: 0 }}
-
-const posToObj = position => {
-
-}
-
-
 
 const startingBoard = () => {
   var board = [[
-    { piece: pieces.whiteRook, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whiteKnight, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whiteBishop, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whiteQueen, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whiteKing, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whiteBishop, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whiteKnight, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whiteRook, moves: [{col: 0, row: 4}, {col: 0, row: 5}] }, 
+    { piece: pieces.whiteRook, moves: [] },
+    { piece: pieces.whiteKnight, moves: [] },
+    { piece: pieces.whiteBishop, moves: [] },
+    { piece: pieces.whiteQueen, moves: [] },
+    { piece: pieces.whiteKing, moves: []},
+    { piece: pieces.whiteBishop, moves: [] },
+    { piece: pieces.whiteKnight, moves: [] },
+    { piece: pieces.whiteRook, moves: [] }, 
   ]]
   board.push([
-    { piece: pieces.whitePawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whitePawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whitePawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whitePawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whitePawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whitePawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whitePawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.whitePawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] }, 
+    { piece: pieces.whitePawn, moves: [] },
+    { piece: pieces.whitePawn, moves: [] },
+    { piece: pieces.whitePawn, moves: [] },
+    { piece: pieces.whitePawn, moves: [] },
+    { piece: pieces.whitePawn, moves: [] },
+    { piece: pieces.whitePawn, moves: [] },
+    { piece: pieces.whitePawn, moves: [] },
+    { piece: pieces.whitePawn, moves: [] }, 
   ])
   for (var i = 0; i < 4; i++) {
     board.push([null, null, null, null, null, null, null, null])
   }
   board.push([
-    { piece: pieces.blackPawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackPawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackPawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackPawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackPawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackPawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackPawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackPawn, moves: [{col: 0, row: 4}, {col: 0, row: 5}] }, 
+    { piece: pieces.blackPawn, moves: [] },
+    { piece: pieces.blackPawn, moves: [] },
+    { piece: pieces.blackPawn, moves: [] },
+    { piece: pieces.blackPawn, moves: [] },
+    { piece: pieces.blackPawn, moves: [] },
+    { piece: pieces.blackPawn, moves: [] },
+    { piece: pieces.blackPawn, moves: [] },
+    { piece: pieces.blackPawn, moves: [] }, 
   ])
   board.push([
-    { piece: pieces.blackRook, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackKnight, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackBishop, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackQueen, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackKing, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackBishop, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackKnight, moves: [{col: 0, row: 4}, {col: 0, row: 5}] },
-    { piece: pieces.blackRook, moves: [{col: 0, row: 4}, {col: 0, row: 5}] }, 
+    { piece: pieces.blackRook, moves: [] },
+    { piece: pieces.blackKnight, moves: [] },
+    { piece: pieces.blackBishop, moves: [] },
+    { piece: pieces.blackQueen, moves: [] },
+    { piece: pieces.blackKing, moves: [] },
+    { piece: pieces.blackBishop, moves: [] },
+    { piece: pieces.blackKnight, moves: [] },
+    { piece: pieces.blackRook, moves: [] }, 
   ])
   return board
 }
-
-const getEmptyBoard = () => {
-  const emptyBoard = []
-  for (var i = 0; i < 8; i++) {
-    emptyBoard.push([])
-    for (var j = 0; j < 8; j++) {
-      emptyBoard[i].push(null)
-    }
-  }
-  return emptyBoard
-}
-
-/*
-export const UNSELECT_SQUARE = 'UNSELECT_SQUARE' 
-export const MOVE = 'MOVE'
-export const SELECT_SQUARE = 'SELECT_SQUARE'
-export const SET_MY_TURN = 'SET_MY_TURN' d 
-export const LOAD_MOVES = 'LOAD_MOVES' d
-export const LOAD_VALID_MOVES = 'LOAD_VALID_MOVES' d
-export const SET_COLOUR = 'SET_COLOUR'
-export const GAME_END = 'GAME_END' 
-export const LOAD_GAME = 'LOAD_GAME' d 
-export const UPDATE_BOARD = 'UPDATE_BOARD' d
-export const UPDATE_GAME_STATUS = 'UPDATE_GAME_STATUS' d
-export const ADD_MESSAGE = 'ADD_MESSAGE'
-*/
-
-// Helper functions for copying state 
-
-const copyMoves = moves => (moves.map(move => ({ ...move })))  
 
 const copyBoard = board => (
   board.map(
     row => row.map(
       square => (
-        square//square ? { piece: { ...square.piece }, moves: square.moves } : null
+        square
       )
     )
   )
 )
-
-const copyGame = game => {
-  const newGame = {
-    ...game,
-    board: copyBoard(game.board),
-    moveHistory: copyMoves(game.moveHistory),
-    selectedSquare: game.selectedSquare ? { ...game.selectedSquare } : null,
-    opponent: game.opponent ? { ...game.opponent, user: { ...game.opponent.user } } : null,
-    messages: game.messages.map(message => ({ ...message })),
-    moveNotation: game.moveNotation.map(move => (move))
-  }
-  return newGame
-}
-
-const copyState = state => {
-  const newState = {}
-  for (const key in state) {
-    newState[key] = copyGame(state[key])
-  }
-  return newState
-}
 
 const getInitialGameState = () => ({
   connected: false,
@@ -160,7 +74,6 @@ const getInitialGameState = () => ({
 })
 
 function gameReducer(state = {}, action) {
-  
   switch (action.type) {
     case actions.LOAD_GAME:
       if (!state[action.game.id]) {
@@ -198,7 +111,8 @@ function gameReducer(state = {}, action) {
           }
         }
       }
-    case actions.START_GAME: //TODO refactor with load game
+
+    case actions.START_GAME: 
       if (!state[action.game.id]) {
         const newGame = getInitialGameState()
         newGame.status = action.game._status
@@ -211,7 +125,7 @@ function gameReducer(state = {}, action) {
             time: {
               me: { time: action.me.time <= 0 ? 0 : action.me.time },
               opponent: { time: action.opponent.time <= 0 ? 0 : action.opponent.time } 
-            } //TODO
+            } 
           }
         }
       }
@@ -269,7 +183,6 @@ function gameReducer(state = {}, action) {
       }
 
     case actions.MOVE:
-      console.log("in move")
       const moveBoard = copyBoard(state[action.gameId].game.board)
       const squareToMove = moveBoard[action.fromPos.row][action.fromPos.col] 
       moveBoard[action.fromPos.row][action.fromPos.col] = null
@@ -318,7 +231,6 @@ function gameReducer(state = {}, action) {
             passant, 
             castle
           }
-          
         }
       )
       return {
@@ -353,7 +265,7 @@ function gameReducer(state = {}, action) {
       }
 
     case actions.GAME_END:
-      return state //TODO
+      return state 
 
     case actions.ADD_MESSAGE:
       const newMessages = state[action.gameId].game.messages.map(message => (message))
@@ -368,6 +280,7 @@ function gameReducer(state = {}, action) {
           }
         }
       }
+
     case actions.ADD_NOTATION:
       const newNotation = state[action.gameId].game.moveNotation.map(message => (message))
       newNotation.push(action.notation)
@@ -381,8 +294,8 @@ function gameReducer(state = {}, action) {
           }
         }
       }
-    case actions.SET_TIMER:
 
+    case actions.SET_TIMER:
       return {
         ...state,
         [action.gameId]: {
@@ -406,6 +319,7 @@ function gameReducer(state = {}, action) {
           }
         }
       }
+
     case actions.REMOVE_PIECE:
       const removeBoard = copyBoard(state[action.gameId].game.board)
       removeBoard[action.position.row][action.position.col] = null
@@ -423,7 +337,6 @@ function gameReducer(state = {}, action) {
     default: 
       return state
   }
-  return state
 }
 
 export default gameReducer

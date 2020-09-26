@@ -3,11 +3,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken 
 from rest_framework.settings import api_settings
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from user.serializers import UserSerializer, AuthTokenSerializer, GameInviteWriteSerializer
-from game.serializers import GameSerializer
+from game.serializers import GameSerializer, TestGameSerializer
 from core.models import User, GameInvite, Game
 from django.db.utils import IntegrityError
 import json, random
@@ -56,12 +56,17 @@ class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email', None)
         password = request.data.get('password', None)
+        print("here is the data")
         print(request.data)
+        print(email)
+        print(password)
         user = authenticate(request, email=email, password=password)
         if user is not None:
+            
             login(request, user)
-            serializer = UserSerializer(user) #TODO constants
+            serializer = UserSerializer(user) 
             return Response(data=serializer.data, status=status.HTTP_200_OK)
+        print("failed")
         return Response(data={}, status=status.HTTP_200_OK)
 
 
@@ -87,35 +92,42 @@ class GameHistory(APIView):
             print(f"Error user with id: {id} not found.")
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        games = Game.objects.filter(
-            player__user=user
+        finished_games = Game.objects.filter(
+            game_to_user__user=user
         ).exclude(
             _status=Game.GameStatus.IN_PROGRESS
-        ).order_by(
-            'date_played'
-        )[0:10]
-        games
-        serializer = GameSerializer(games, many=True)
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+        )
+        games_played = finished_games.count()
+        num_won_games = finished_games.filter(game_to_user__winner=True).count()
+        serializer = TestGameSerializer(finished_games.order_by('date_played')[0:10], many=True)
+        data = { 'results': serializer.data, 'wins': num_won_games,  'games_played': games_played }
+        return Response(data=data, status=status.HTTP_200_OK)
 
 class CreateGuest(APIView):
     """
     Endpoint for creating a guest account
     """
     def get(self, request):
+        password = "fakepassword123"
         while True:
             random_num = random.randint(0, 10000)
+            email = f"fakeemail{random_num}@email.ca"
             try:
-                guest_user = User.objects.create(
+                get_user_model().objects.create_user(
                     is_guest=True,
                     name=f"Guest{random_num}",
-                    email=f"fakeemail{random_num}@email.ca",
-                    password="fakepassword123"
+                    email=email,
+                    password=password
                 )
             except IntegrityError as ex:
                 print(f"Integrity Error: {ex}")
             else:
                 break
-        serializer = UserSerializer(guest_user)
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+        return Response(
+            status=status.HTTP_200_OK,
+            data={
+                'email': email,
+                'password': password
+            }
+        )
                 

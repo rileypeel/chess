@@ -9,7 +9,6 @@ import { move, selectSquare, unselectSquare } from '../../actions/game'
 
 const Board = props => {
   const gameData = props.game
-  
   const onSquareClick = position => {
       const tryToSelect = (square) => {
         if (square) {
@@ -22,19 +21,15 @@ const Board = props => {
       if (!gameData.selectedSquare) {
         tryToSelect(square)
       } else {
-        
         if (gameData.myTurn) {
-  
           const pieceToMove = gameData.board[gameData.selectedSquare.row][gameData.selectedSquare.col]
-          
           const moveType = isValidMove(pieceToMove, position)
           if (moveType) {  
-            console.log(props.id)
             props.move(pieceToMove, gameData.selectedSquare, position, moveType, props.id)
             props.sendMove(gameData.selectedSquare, position, props.id)
             props.unselect(props.id)
           } else {
-            props.unselect(props.id) //add a select if this position has a piece of yours
+            props.unselect(props.id)
             tryToSelect(square)
           }
         } else {
@@ -58,7 +53,7 @@ const Board = props => {
   return (
     <div>
       <div className="board">
-        { squares }
+        {squares}
       </div>
     </div>
   )

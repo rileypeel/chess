@@ -132,7 +132,6 @@
   margin: 10px;
 }
 
-
 .grey-box-shadow {
   border-style: solid;
   box-shadow: 0 2px 8px 0 rgb(169,169,169);
@@ -162,7 +161,6 @@
   text-align: center;
 }
 
-
 #login-button {
   margin: 10px;
   text-align: center;
@@ -173,10 +171,6 @@
 
 .login-page {
   background-color: green;
-}
-
-.square {
-  
 }
 
 .black {

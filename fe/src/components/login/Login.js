@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { Form } from 'semantic-ui-react'
-import { loginUser, logoutUser, fetchUser } from '../../actions/user'
+import { loginUser, logoutUser, fetchUser, createGuest } from '../../actions/user'
 import { HOME } from '../../constants/app'
 import { setRegisterModalOpen} from '../../actions/ui'
 import EmailPasswordFields from './EmailPasswordFields'
@@ -13,12 +13,9 @@ import 'react-notifications-component/dist/theme.css'
 import 'animate.css'
 
 const Login = props => {
-  
   React.useEffect(() => { 
     props.getUser()
   }, [])  
-
-
   const history = useHistory()
   if (props.isAuthenticated) {
     history.push(HOME)
@@ -35,6 +32,9 @@ const Login = props => {
           </button>
           <button id="create-button" className="ui button" onClick={() => props.setModalOpen(true)}>
             Create Account
+          </button>
+          <button id="guest-button" className="ui button" onClick={() => props.createGuest()}>
+            Try as Guest
           </button>
           <RegisterModal/>
         </div>
@@ -60,7 +60,8 @@ const mapDispatchToProps = dispatch => {
       dispatch(logoutUser())
     },
     setModalOpen: value => dispatch(setRegisterModalOpen(value)),
-    getUser: () => dispatch(fetchUser())
+    getUser: () => dispatch(fetchUser()),
+    createGuest: () => dispatch(createGuest())
   }
 }
 

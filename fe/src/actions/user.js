@@ -47,6 +47,17 @@ export function fetchUser() {
       })
   }
 }
+export function createGuest() {
+  return dispatch => {
+    return api.getGuest()
+    .then(response => {
+      dispatch(loginUser({
+        email: response.email,
+        password: response.password
+      }))
+    })
+  }
+}
 
 export function loginUser(userCredentials) {
   return dispatch => {
@@ -110,12 +121,7 @@ export const sendInvite = (inviteObj) => {
   return dispatch => {
     return api.sendInvite(inviteObj).then((status) => {
       if (status == 201) {
-        //success notification
-        //close modal and clear fields
-      } else {
-      
-        //error notification
-      }
+      } 
     })
   }
 }

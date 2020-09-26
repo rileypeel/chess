@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import '../App.css'
 
 const GameStatusBox = props => {
-  console.log(props.moves)
   const moves = []
   var moveNumber = 1
   for (var i = 0; i < props.moves.length; i += 2) { //TODO fix indexes here
@@ -12,11 +11,9 @@ const GameStatusBox = props => {
       <div>
         { moveNumber }: { props.moves[i] } { blackMove }
       </div>
-    
     )
     moveNumber ++
   }
-
   return (
     <div className="game-status-box">
       <h3>Moves</h3>
@@ -33,6 +30,5 @@ const mapStateToProps = (state, ownProps) => {
     moves: state.game[id].game.moveNotation
   }
 }
-
 
 export default connect(mapStateToProps, null)(GameStatusBox)

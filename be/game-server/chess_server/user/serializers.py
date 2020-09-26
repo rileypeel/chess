@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from core.models import User, GameInvite, Game
 
+
+
 class UserSerializer(serializers.ModelSerializer):
 	"""Serializers for the users object"""
 

@@ -20,7 +20,8 @@ const initialState = {
     value: ''
   },
   selectedUser: null,
-  inviteMessage: ''
+  inviteMessage: '',
+  gameHistory: null
 }
 
 function userReducer(state = initialState, action) {
@@ -74,7 +75,24 @@ function userReducer(state = initialState, action) {
     case actions.SET_ATTEMPTED_FETCH:
       return { ...state, attemptedFetch: action.value }
     case actions.SET_HISTORY:
-      return state
+      const me = state.id
+      if (!action.results) return state
+      return {
+        ...state,
+        gameHistory: action.results.map(item => {
+          var opponent = item.game_to_user[0]
+          if (item.game_to_user[0].user.id != me) {
+            opponent = item.game_to_user[1]
+          }
+          return {
+            datePlayed: item.date_played,
+            opponent: opponent.user.name,
+            won: !opponent.winner
+          }
+        }),
+        totalGames: action.games_played,
+        totalWins: action.wins
+      }
     default:
       return state
   }

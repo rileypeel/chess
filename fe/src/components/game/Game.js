@@ -8,10 +8,7 @@ import GameStatusBox from './GameStatusBox'
 import Timer from './Timer'
 import '../App.css'
 
-
 const Game = props => {
-  if (!props.gameStatus) {
-  }
   React.useEffect(() => {
     props.updateTimes(props.id)
   }, [])

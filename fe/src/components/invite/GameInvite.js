@@ -8,32 +8,24 @@ import UserLabel from '../user/UserLabel'
 import '../App.css'
 
 const GameInvite = props => {
-
-  var formattedResults = []
-  if (props.results) {
-    for (var i = 0; i < props.results.length; i++) {
-      formattedResults.push({title: props.results[i].name, online: props.results[i].online})
-    }
-  }
   const resultSelected = (e, data) => {
     props.setSelectedUser(data.result)
     props.setOpen(true)
   }
   const searchChange = (e, data) => {
     props.search(data.value)
-
   }
-  const renderer = ({ name, online }) => {
+  const renderer = ({ name, online, rating }) => {
     const color = online ? "green" : "grey"
     return (  
       <div style={{display: "inline-block"}}>
         <Icon size="small" color={color} name="circle" />
-        <UserLabel style={{width: "auto"}} name={name} rating={1200} />
+        <UserLabel style={{width: "auto"}} name={name} rating={rating} />
       </div>
     )
   }
   return (
-    <div className="view">
+    <div>
       <h2>Invite to game</h2>
       <InviteModal/>
       <Search

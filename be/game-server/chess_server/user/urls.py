@@ -12,6 +12,7 @@ urlpatterns = [
 	path('login/', views.LoginView.as_view(), name='login'),
 	path('search/<queryStr>', views.UserSearch.as_view(), name='search'),
 	path('create-invite/', views.CreateGameInvite.as_view(), name='create_game_invite'),
-	path('completed-games/<int:id>', views.GameHistory.as_view(), name='game_history')
+	path('completed-games/<int:id>', views.GameHistory.as_view(), name='game_history'),
+	path('create-guest/', views.CreateGuest.as_view(), name='create_guest')
 
 ]

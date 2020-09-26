@@ -5,9 +5,7 @@ import { addMessage } from '../../actions/game'
 import { sendMessage } from '../../actions/webSocket'
 import '../App.css'
 
-
 const Chat = props => {
-
   const keyPressed = (e) => {
     if (e.charCode == 13) {
       props.addMessage({ sender: props.me, message: e.target.value }, props.id)
@@ -23,7 +21,7 @@ const Chat = props => {
   const messageDisplay = props.messages.map(message => {
     return (
       <div className="chat-message">
-        { message.sender }: { message.message }
+        {message.sender}: {message.message}
       </div>
     )}  
   )
@@ -32,10 +30,9 @@ const Chat = props => {
     <div className="chat-container">
       <h1 className="chat-header">Chat</h1>
       <div className="chat-messages">
-        { messageDisplay }
+        {messageDisplay}
         <div ref={messageBox} style={{ height: "0px" }}></div>
       </div>
-      
       <div className="chat-input-container" >
         <input className="chat-input" onKeyPress={keyPressed} placeholder="Send a message...."/>
       </div>
@@ -43,7 +40,6 @@ const Chat = props => {
     
   )
 }
-
 
 const mapDispatchToProps = dispatch => {
   return {
