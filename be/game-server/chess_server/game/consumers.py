@@ -27,15 +27,14 @@ def game_timeout_callback(game_id, player_id):
     runs out
     """
     game = Game.objects.get(id=game_id)
+    players = game.game_to_user
+    if players[0].id == player_id:
+        players[0].timeout = True
+        players[0].save()
+    if players[1].id == player_id:
+        players[1].timeout = True
+        players[1].save()
     game.status = Game.GameStatus.TIMEOUT
-    player1, player2 = Player.objects.filter(game=game)
-    winner_loser = (False, True)
-    if player1.id == player_id:
-        winner_loser = (True, False)
-    player1.winner, player2.winner = winner_loser
-    player1.save()
-    player2.save()
-    game.save()
 
 
 class ChessConsumer(JsonWebsocketConsumer):
@@ -155,6 +154,14 @@ class ChessConsumer(JsonWebsocketConsumer):
             print(f"Error: game with id: {game_id} not found.")
         self.game_controllers.append(GameController(game, self.scope['user']))
 
+    def remove_game(self, message):
+        """
+        Remove game from active game controllers when it has ended
+        """
+        game_id = message[constants.GAME_ID]
+        for gc in self.game_controllers:
+            if str(gc.game.id) == game_id:
+                self.game_controllers.remove(gc)
 
 class GameController:
 
@@ -388,6 +395,15 @@ class GameController:
             }
         })
 
+    def resign(self, **kwargs):
+        """
+        Handle client sending a resign message
+        """
+        self.my_player.resigned = True
+        self.my_player.save()
+        self.game.status = Game.GameStatus.RESIGN
+        self.game.save()
+
     def status_update(self, **kwargs):
         """
         Fetch game results from DB and send over channel for 
@@ -401,9 +417,12 @@ class GameController:
                 constants.CLIENT_TYPE: constants.CLIENT_TYPE_STATUS_UPDATE,
                 constants.CLIENT_STATUS: self.game.status,
                 constants.CLIENT_WINNER: self.my_player.winner,
-                constants.CLIENT_LOSER: self.my_player.loser,
                 constants.GAME_ID: str(self.game.id)     
             }
+        })
+        async_to_sync(get_channel_layer().send)(self.user.channel_name, {
+            constants.TYPE: constants.CLIENT_SEND,
+            constants.GAME_ID: str(self.game.id) 
         })
 
 

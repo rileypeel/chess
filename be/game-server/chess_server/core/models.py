@@ -208,8 +208,8 @@ class Game(models.Model):
         STALEMATE = chess.constants.STALEMATE
         CHECKMATE = chess.constants.CHECKMATE
         IN_PROGRESS = chess.constants.IN_PROGRESS
-        RESIGN = 'resign'
-        TIMEOUT = 'timeout'
+        RESIGN = constants.RESIGN
+        TIMEOUT = constants.TIMEOUT
 
     players = models.ManyToManyField(
         User, 
@@ -219,7 +219,6 @@ class Game(models.Model):
     date_played = models.DateField(auto_now_add=True)
     _status = models.CharField(max_length=32, choices=GameStatus.choices, default=GameStatus.IN_PROGRESS)
     _started = models.BooleanField(default=False)
-    resigned_colour = models.BooleanField(null=True)
 
     @property
     def status(self):
@@ -231,7 +230,7 @@ class Game(models.Model):
         Observe property changes, set winner if game is over
         """
         if self._status != new_status and new_status != self.GameStatus.IN_PROGRESS:
-            self.set_winner()
+            self.set_winner(new_status)
         self._status = new_status
         self.status_callback = {
             constants.FUNCTION: group_send,
@@ -256,32 +255,42 @@ class Game(models.Model):
             })
         self._started = new_value
 
-    def set_winner(self):
+    def set_winner(self, new_status):
         """
         Helper method sets winner of game and 
         updates ratings
         """
         winning_colour = False
-        if self.status == self.GameStatus.RESIGN:
-            winning_colour = not self.resigned_colour
-        else :
+        player1, player2 = self.game_to_user[0], self.game_to_user[1]
+        winner_loser = (True, False)
+        if new_status == self.GameStatus.RESIGN:
+            if player1.resigned:
+                player2.winner = True
+            if player2.resigned:
+                player1.winner = True
+
+        elif new_status == self.GameStatus.TIMEOUT:
+            if player1.timeout:
+                player2.winner = True
+            if player2.timeout:
+                player1.winner = True
+
+        elif new_status == self.GameStatus.STALEMATE:
+            player1.draw, player2.draw = True
+
+        else:
             moves = Move.objects.filter(game=self).order_by(
                 '-move_number')
             if moves:
-                winning_colour = moves[0].colour
+                if moves[0].colour is player1.colour:
+                    player1.winner = True
+                else: 
+                    player2.winner = True
 
-        players = Player.objects.filter(game=self)
-        player1, player2 = players[0], players[1]
-        
-        winner_loser = (False, True)
-        if player1.colour == winning_colour:
-            winner_loser = (True, False)
-        
-        player1.winner, player2.winner = winner_loser
         player1.save()
         player2.save()
-        player1.user.update_rating(self.status, player1.winner, player2.user.rating)
-        player2.user.update_rating(self.status, player2.winner, player1.user.rating)
+        player1.user.update_rating(new_status, player1.winner, player2.user.rating)
+        player2.user.update_rating(new_status, player2.winner, player1.user.rating)
         player1.user.save()
         player2.user.save()
 
@@ -306,8 +315,11 @@ class Player(models.Model):
     _turn = models.BooleanField(default=False)
     colour = models.BooleanField()
     winner = models.BooleanField(default=False)
-    loser = models.BooleanField(default=False)
+    draw = models.BooleanField(default=False)
     turn_started_timestamp = models.DecimalField(null=True, decimal_places=2, max_digits=14)
+    resigned = models.BooleanField(default=False)
+    timeout = models.BooleanField(default=False)
+
 
     @property
     def turn(self):
