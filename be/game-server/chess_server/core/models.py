@@ -106,6 +106,8 @@ class MoveManager(models.Manager):
             captured_piece_type=captured_piece
         )
         new_move.save()
+        new_move.refresh_from_db()
+        return new_move
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -134,13 +136,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_k_factor(self):
         """Method to determine a players k factor"""
+        print("filter in k factor")
         num_games = Game.objects.filter(players__id=self.id).count()
+        print("filter in k factor")
         if num_games < 30:
             return 25
         if self.rating < 2400:
             return 15
         return 10
 
+    def save(self, *args, **kwargs):
+        print("SAVING USER")
+        super().save(*args, **kwargs)
 
 class GameInvite(models.Model):
     """Model for a Game invitaion"""
@@ -281,23 +288,32 @@ class Game(models.Model):
         else:
             moves = Move.objects.filter(game=self).order_by(
                 '-move_number')
+            print("in set winner checking moves")
+            print(moves)
             if moves:
                 if moves[0].colour is player1.colour:
+                    print("setting a winner")
                     player1.winner = True
                 else: 
+                    print("setting a winner else")
                     player2.winner = True
-
+        print("first save")
         player1.save()
+        print("first save done")
+        print("second save")
         player2.save()
+        print("second save done")
         player1.user.update_rating(new_status, player1.winner, player2.user.rating)
         player2.user.update_rating(new_status, player2.winner, player1.user.rating)
         player1.user.save()
         player2.user.save()
+        print("DONE SET WINNER!!!")
 
     def save(self, *args, **kwargs):
         """
         Override save
         """
+        print("GAME SAVE CALLED")
         super().save(*args, **kwargs)
         callback = getattr(self, 'status_callback', None)
         if callback:
@@ -349,6 +365,13 @@ class Player(models.Model):
             if self.time < 0:
                 self.time = 0
 
+    def save(self, *args, **kwargs):
+        print("before super")
+        super().save(*args, **kwargs)
+        print("after super")
+        print(f"saving player {self.user.name}")
+        print(f"player winner {self.winner}")
+
 class Move(models.Model):
     """Model for a move made in a game"""
     class Piece(models.TextChoices):
@@ -388,7 +411,7 @@ class Move(models.Model):
         """
         Computes string in chess notation for a move
         """
-        col_ascii = ord('a') + 1    
+        col_ascii = ord('a')  
         from_row = self.from_position_y + 1
         to_row = self.to_position_y + 1
         from_col = chr(col_ascii + self.from_position_x)

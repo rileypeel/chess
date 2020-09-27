@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import  { useEffect, useRef } from 'react';
 
-function useInterval(callback, delay, runTimer) {
+function useInterval(callback, runTimer) {
   const savedCallback = useRef()
   const intervalId = useRef()
   // Remember the latest callback.
@@ -14,7 +14,7 @@ function useInterval(callback, delay, runTimer) {
       savedCallback.current()
     }
     if (runTimer) {
-      intervalId.current = setInterval(tick, delay)
+      intervalId.current = setInterval(tick, 1000)
     } else {
       clearInterval(intervalId.current)
     }

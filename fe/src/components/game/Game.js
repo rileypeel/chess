@@ -1,6 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { updateTimes } from '../../actions/webSocket'
+import { Confirm } from 'semantic-ui-react'
+import { updateTimes, sendResign } from '../../actions/webSocket'
+import { confirmResign } from '../../actions/game'
 import Board from '../board/Board'
 import UserLabel from '../user/UserLabel'
 import Chat from './Chat'
@@ -19,8 +21,9 @@ const Game = props => {
         <div style={{ marginBottom: "10px", alignItems: "center" }} className="flex-row opponent-label">
           <UserLabel name={props.opponent.user.name} rating={props.opponent.user.rating}/>
           <div style={{ marginLeft: "10px" }}>
-          <Timer timeKey={'opponent'} id={props.id} timeRunning={!props.myTurn}/>
+          <Timer timeKey={'opponent'} id={props.id} timeRunning={!props.myTurn && !props.gameOver}/>
           </div>
+          
         </div>
         <Board id={props.id}/>
         <div style={{ marginTop: "10px", alignItems: "center" }} className="flex-row my-label">
@@ -28,6 +31,17 @@ const Game = props => {
           <div style={{ marginLeft: "10px" }}>
             <Timer timeKey={'me'} id={props.id} timeRunning={props.myTurn}/>
           </div>
+            <button style={{ marginLeft: '10px' }} className="ui button" onClick={() => props.setConfirm(true, props.id)}>
+              Resign
+            </button>
+            <Confirm
+              open={props.confirmOpen}
+              onCancel={() => props.setConfirm(false, props.id)}
+              onConfirm={() => {
+                props.sendResign(props.id)
+                props.setConfirm(false, props.id)
+              }}
+            />
         </div>
       </div>
       <div style={{ height: "fit-content" }} className="status-column grey-box-shadow">
@@ -44,13 +58,17 @@ const mapStateToProps = (state, ownProps) => {
     myTurn: state.game[id].game.myTurn,
     gameStatus: state.game[id].game.gameStatus,
     opponent: state.game[id].game.opponent,
-    me: state.user
+    me: state.user,
+    confirmOpen: state.game[id].game.confirmResignOpen,
+    gameOver: state.game[id].game.gameOver
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateTimes: gameId => dispatch(updateTimes(gameId))
+    updateTimes: gameId => dispatch(updateTimes(gameId)),
+    sendResign: gameId => dispatch(sendResign(gameId)),
+    setConfirm: (value, gameId) => dispatch(confirmResign(value, gameId))
   }
 }
 

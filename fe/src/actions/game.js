@@ -20,6 +20,10 @@ export const ADD_CASTLE = 'ADD_CASTLE'
 export const ADD_PASSANT = 'ADD_PASSANT'
 export const REMOVE_PIECE = 'REMOVE_PIECE'
 export const LOAD_BOARD = 'LOAD_BOARD'
+export const CONFIRM_RESIGN = 'CONFIRM_RESIGN'
+export const SET_GAME_OVER = 'SET_GAME_OVER'
+export const REMOVE_GAME = 'REMOVE_GAME'
+
 
 export const loadBoard = (board, gameId) => ({ type: LOAD_BOARD, board, gameId })
 export const removePiece = (position, gameId) => ({ type: REMOVE_PIECE, position, gameId })
@@ -40,12 +44,15 @@ export const startGame = (game, me, opponent) => ({ type: START_GAME, game, me, 
 export const addMoveNotation = (notation, gameId) => ({ type: ADD_NOTATION, notation, gameId })
 export const addCastle = (move, gameId) => ({ type: ADD_CASTLE, move, gameId })
 export const addPassant = (move, gameId) => ({ type: ADD_PASSANT, move, gameId })
+export const confirmResign = (value, gameId) => ({ type: CONFIRM_RESIGN, value, gameId })
+export const setGameOver = (value, gameId) => ({ type: SET_GAME_OVER, value, gameId })
+export const removeGame = gameId => ({ type: REMOVE_GAME, gameId })
 
 export const move = (pieceToMove, fromPos, toPos, moveType, gameId) => {
   return dispatch => {
-    if (moveType == CASTLE) {
+    if (moveType === CASTLE) {
       dispatch(movePiece(pieceToMove.castle.rookFrom, pieceToMove.castle.rookTo, gameId))
-    } else if (moveType == EN_PASSANT) {
+    } else if (moveType === EN_PASSANT) {
       dispatch(removePiece(pieceToMove.passant.capture, gameId))
     } 
     dispatch(movePiece(fromPos, toPos, gameId))

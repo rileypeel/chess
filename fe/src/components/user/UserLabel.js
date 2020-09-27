@@ -7,11 +7,11 @@ const UserLabel = props => (
   <Label
     size={props.size}
     style={{height: "max-content"}}
-    classNameas='a'
+    as='a'
     color='grey'
     image
   >
-    <img style={{display: "inline-block"}} src={defaultImg} />
+    <img alt="" style={{display: "inline-block"}} src={defaultImg} />
     {props.name}
     <Label.Detail>{props.rating}</Label.Detail>
   </Label>

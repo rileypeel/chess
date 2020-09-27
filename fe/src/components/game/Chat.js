@@ -1,13 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Table, Input, MessageItem } from 'semantic-ui-react'
 import { addMessage } from '../../actions/game'
 import { sendMessage } from '../../actions/webSocket'
 import '../App.css'
 
 const Chat = props => {
   const keyPressed = (e) => {
-    if (e.charCode == 13) {
+    if (e.charCode === 13) {
       props.addMessage({ sender: props.me, message: e.target.value }, props.id)
       props.sendMessage(e.target.value, props.id)
       e.target.value = ""

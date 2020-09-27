@@ -2,11 +2,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Menu } from 'semantic-ui-react'
 import { setActiveItem } from '../../actions/ui'
+import { logoutUser } from '../../actions/user'
 import { Link } from 'react-router-dom'
-import { HOME, LOGIN, USER, GAME } from '../../constants/app'
+import { HOME, GAME } from '../../constants/app'
 import '../App.css'
 
 const MenuBar = (props) => {
+  const logoutClicked = () => {
+    console.log('log out clicked')
+    props.logout()
+  }
   return (
     <div className="menu">
       <Menu pointing secondary>
@@ -26,11 +31,9 @@ const MenuBar = (props) => {
         />
         <Menu.Menu position='right'>
           <Menu.Item
-            as={Link}
-            to={LOGIN}
             name='logout'
             active={props.activeItem === 'logout'}
-            onClick={props.itemClick}
+            onClick={logoutClicked}
           />
         </Menu.Menu>
       </Menu>
@@ -48,7 +51,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     itemClick: (event, menuItem) => { 
       return dispatch(setActiveItem(menuItem.name))
-    }
+    },
+    logout: () => dispatch(logoutUser())
   }
 }
 

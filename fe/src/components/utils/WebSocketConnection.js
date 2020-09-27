@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { connectWS} from '../../actions/webSocket'
 import { WS_HOST} from '../../constants/app'
 
-const WebSocketConnection = props => {
+const WebSocketConnection = (props) => {
 
   useEffect(() => {
     props.connectWS(WS_HOST)

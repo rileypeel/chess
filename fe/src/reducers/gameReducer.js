@@ -1,6 +1,6 @@
 import * as actions from '../actions/game'
 import * as constants from '../constants/app'
-import { pieces, BLACK, WHITE, EN_PASSANT, CASTLE } from '../constants/app'
+import { pieces, BLACK, EN_PASSANT, CASTLE } from '../constants/app'
 
 const startingBoard = () => {
   var board = [[
@@ -89,8 +89,9 @@ const getInitialGameState = () => ({
   myColour: BLACK,
   me: null,
   opponent: null,
-  gameStatus: true,
   moveNotation: [],
+  confirmResignOpen: false,
+  gameOver: false
 })
 
 function gameReducer(state = {}, action) {
@@ -130,10 +131,7 @@ function gameReducer(state = {}, action) {
 
     case actions.LOAD_MOVES:
       const moves = action.moves.map((moveItem) => {
-        return {
-          from: { row: moveItem.from[1], col: moveItem.from[0] },
-          to: { row: moveItem.to[1], col: moveItem.to[0] }
-        }
+        return moveItem.notation
       })
       return {
         ...state,
@@ -141,7 +139,7 @@ function gameReducer(state = {}, action) {
           ...state[action.gameId],
           game: {
             ...state[action.gameId].game,
-            moveHistory: moves
+            moveNotation: moves
           }
         }
       }
@@ -202,8 +200,8 @@ function gameReducer(state = {}, action) {
       const squareToMove = moveBoard[action.fromPos.row][action.fromPos.col] 
       moveBoard[action.fromPos.row][action.fromPos.col] = null
       moveBoard[action.toPos.row][action.toPos.col] = { piece: { ...squareToMove.piece }, moves: []}
-      if (squareToMove.piece.type == 'pawn'){
-        if (action.toPos.row == 0 || action.toPos.row == 7) {
+      if (squareToMove.piece.type === 'pawn'){
+        if (action.toPos.row === 0 || action.toPos.row === 7) {
           moveBoard[action.toPos.row][action.toPos.col] = {
             piece: { ...constants.pieceBySymbol['Q'][squareToMove.piece.colour] },
             moves: []
@@ -230,12 +228,12 @@ function gameReducer(state = {}, action) {
         var castle = null
         if (item.special_moves) {
           item.special_moves.forEach(specialItem => {
-            if (specialItem.type == EN_PASSANT) {
+            if (specialItem.type === EN_PASSANT) {
               passant = {
                 to: { row: specialItem.to[1], col: specialItem.to[0] },
                 capture: { row: specialItem.capture[1], col: specialItem.capture[0] }
               } 
-            } else if (specialItem.type == CASTLE) {
+            } else if (specialItem.type === CASTLE) {
               castle = {
                 to: { row: specialItem.to[1], col: specialItem.to[0] },
                 rookTo: { row: specialItem.rook_to[1], col: specialItem.rook_to[0] },
@@ -336,7 +334,35 @@ function gameReducer(state = {}, action) {
           }
         }
       }
-  
+    case actions.CONFIRM_RESIGN:
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            confirmResignOpen: action.value
+          }
+        }
+      }
+
+    case actions.SET_GAME_OVER:
+      console.log(action)
+      return {
+        ...state,
+        [action.gameId]: {
+          ...state[action.gameId],
+          game: {
+            ...state[action.gameId].game,
+            gameOver: action.value
+          }
+        }
+      }
+    case actions.REMOVE_GAME:
+      const removedState = { ...state }
+      delete removedState[action.gameId]
+      return removedState
+
     default: 
       return state
   }

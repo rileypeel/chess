@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Form, Button, Modal, Grid, Message} from 'semantic-ui-react'
+import { Form, Button, Modal, Grid} from 'semantic-ui-react'
 import EmailPasswordFields from './EmailPasswordFields'
 import { setRegistering, setRegisterModalOpen} from '../../actions/ui' 
 import { registerUser, updateUsernameField, clearAuthFields } from '../../actions/user'

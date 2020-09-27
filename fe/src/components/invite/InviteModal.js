@@ -23,6 +23,7 @@ const InviteModal = props => {
     props.setMessage('')
   }
   const name = props.selectedUser ? props.selectedUser.name : ''
+  const rating = props.selectedUser ? props.selectedUser.rating : ''
   return ( 
     <Modal
       onClose={() => props.setOpen(false)}
@@ -36,7 +37,7 @@ const InviteModal = props => {
         <Modal.Description>
         </Modal.Description>
         <div style={{ display: "inlineBlock"}}>
-          To: <UserLabel style={{width: "auto"}} rating={1200} name={name}/>
+          To: <UserLabel style={{width: "auto"}} rating={rating} name={name}/>
         </div>
         <Form>
           <Form.Field

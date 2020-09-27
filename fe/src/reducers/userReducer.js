@@ -40,7 +40,8 @@ function userReducer(state = initialState, action) {
     case actions.REGISTER_USER:
       return { ...state, registerResult: { success: true }}
     case actions.LOGOUT_USER:
-      return { ...state, name: null, email: null, isAuthenticated: false }
+      console.log("in logout")
+      return { ...state, id: null, name: null, email: null, isAuthenticated: false }
     case actions.UPDATE_EMAIL_FIELD:
       return { ...state, authFields: { 
         ...state.authFields,
@@ -76,12 +77,14 @@ function userReducer(state = initialState, action) {
       return { ...state, attemptedFetch: action.value }
     case actions.SET_HISTORY:
       const me = state.id
+      console.log(state)
+      console.log(action)
       if (!action.results) return state
       return {
         ...state,
         gameHistory: action.results.map(item => {
           var opponent = item.game_to_user[0]
-          if (item.game_to_user[0].user.id != me) {
+          if (item.game_to_user[0].user.id === me) {
             opponent = item.game_to_user[1]
           }
           return {

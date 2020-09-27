@@ -13,15 +13,18 @@ import 'react-notifications-component/dist/theme.css'
 import 'animate.css'
 
 const Login = props => {
+  const history = useHistory()
   React.useEffect(() => { 
     props.getUser()
-  }, [])  
-  const history = useHistory()
-  if (props.isAuthenticated) {
-    history.push(HOME)
-  }
+  }, [])
+  React.useEffect(() => { 
+    if (props.isAuthenticated) {
+      history.push(HOME)
+    }
+  }, [props.isAuthenticated])  
+
   return (
-    <div class="login-page"> 
+    <div className="login-page"> 
       <div className="login-box">
         <div className="form">
           <Form>

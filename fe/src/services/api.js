@@ -5,7 +5,6 @@ const LOGOUT_URL = `${BASE_URL}user/logout/`
 const REGISTER_URL = `${BASE_URL}user/create/`
 const SEARCH_URL = `${BASE_URL}user/search/`
 const INVITE_URL = `${BASE_URL}user/create-invite/`
-const INVITE_LIST_URL = `${BASE_URL}user/invites/`
 const GAME_HISTORY_URL = `${BASE_URL}user/completed-games/`
 const GUEST_URL = `${BASE_URL}user/create-guest/`
 
@@ -29,27 +28,27 @@ const httpGet = (url) => httpRequest(url, { method: 'GET', credentials: 'include
 export default {
   async fetchUser() {
     const response = await httpGet(FETCH_USER)
-    if (response.status == 200) {
+    if (response.status === 200) {
       return await response.json()
     }
   },
 
   async getGuest() {
     const response = await httpGet(GUEST_URL)
-    if (response.status == 200) {
+    if (response.status === 200) {
       return await response.json()
     }
   },
 
   async loginUser(userCredentials) {
     const response = await httpPost(LOGIN_URL, userCredentials)
-    if (response.status == 200) {
+    if (response.status === 200) {
       return await response.json()
     }
   },
 
   async logoutUser() {
-    //todo
+    return await httpGet(LOGOUT_URL)
   },
 
   async registerUser(user) {
@@ -59,7 +58,7 @@ export default {
 
   async searchUser(queryStr) {
     const response = await httpGet(`${SEARCH_URL}${queryStr}`)
-    if (response.status == 200) {
+    if (response.status === 200) {
       return await response.json()
     }
   },
@@ -68,10 +67,10 @@ export default {
     const response = await httpPost(INVITE_URL, inviteObj)
     return response.status
   },
-  
+
   async fetchGameHistory(user_id) {
     const response = await httpGet(`${GAME_HISTORY_URL}${user_id}`)
-    if (response.status == 200) {
+    if (response.status === 200) {
       return await response.json()
     }
   }

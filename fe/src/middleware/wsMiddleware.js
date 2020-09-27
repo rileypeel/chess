@@ -1,6 +1,7 @@
 import * as actions from '../actions/webSocket'
-import { saveInvite, setInviteSender } from '../actions/user'
+import { saveInvite, setInviteSender, logoutUser } from '../actions/user'
 import { setAcceptModalOpen, setGoToGame } from '../actions/ui'
+import { endGameNotify } from '../services/notification'
 import * as gameActions from '../actions/game'
 import { notify } from '../services/notification'
 import * as constants from '../constants/app'
@@ -47,16 +48,13 @@ const socketMiddleware = () => {
         )
         break
       case constants.GAME_STATUS_UPDATE:
+        console.log(payload)
         store.dispatch(gameActions.setMyTurn(false, payload.game_id))
-        notify(
-          payload.status,
-          payload.winner ? 'You won!' : 'You lost, better luck next time',
-          {
-            type: payload.winner ? 'success' : 'danger',
-            container: 'center'
-          }
-        )
+        store.dispatch(gameActions.setGameOver(true, payload.game_id))
+        const callback = () => store.dispatch(gameActions.removeGame(payload.game_id))
+        endGameNotify(payload.winner, payload.status, callback)
         break
+
       case constants.LOAD_MOVES:
         store.dispatch(gameActions.loadMoves(payload.move_list, payload.game_id))
         break
@@ -118,18 +116,18 @@ const socketMiddleware = () => {
         const from = { col: move.from[0], row: move.from[1] }
         const to = { col: move.to[0], row: move.to[1] }
         store.dispatch(gameActions.movePiece(from, to, payload.game_id))
-        if (move.type == constants.EN_PASSANT) {
+        if (move.type === constants.EN_PASSANT) {
           store.dispatch(
             gameActions.removePiece(
               { col: move.to[0], row: move.from[1] },
               payload.game_id
               )
             )
-        } else if (move.type == constants.CASTLE) {
+        } else if (move.type === constants.CASTLE) {
           store.dispatch(
             gameActions.movePiece(
-              { row: move.from[1], col: move.to[0] == 1 ? 0 : 7 },
-              { row: move.to[1], col: move.to[0] == 1 ? 2 : 5},
+              { row: move.from[1], col: move.to[0] === 1 ? 0 : 7 },
+              { row: move.to[1], col: move.to[0] === 1 ? 2 : 5},
               payload.game_id
             )
           )
@@ -137,15 +135,16 @@ const socketMiddleware = () => {
         store.dispatch(gameActions.addMoveNotation(moveNotation, payload.game_id))
         break
       case constants.MOVE_RESPONSE:
-        if (payload.success) {
-          const moveNotation = payload.notation
-          store.dispatch(gameActions.addMoveNotation(moveNotation, payload.game_id))
-        } 
-    }
+        console.log("in move response!!")
+        store.dispatch(gameActions.addMoveNotation(payload.notation, payload.game_id))
+        
+        break
+      default:
+        break 
+    } 
   }
 
   const onClose = store => (event) => {
-    console.log("closing socket....")
   }
 
   const onOpen = store => (event) => {
@@ -205,6 +204,11 @@ return store => next => action => {
         break
 
       case actions.SEND_RESIGN:
+        console.log("sending resign....")
+        socket.send(JSON.stringify({
+          type: constants.GAME_RESIGN,
+          game_id: action.gameId
+        }))
         break
       default:
         return next(action)

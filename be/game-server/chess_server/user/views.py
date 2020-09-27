@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken 
 from rest_framework.settings import api_settings
-from django.contrib.auth import authenticate, login, get_user_model
+from django.contrib.auth import authenticate, login, get_user_model, logout
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from user.serializers import UserSerializer, AuthTokenSerializer, GameInviteWriteSerializer
@@ -51,6 +51,16 @@ class CreateGameInvite(APIView):
         print(serializer.errors)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+class LogoutView(APIView):
+    """
+    View for user logout
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    def get(self, request):
+        logout(request)
+        print("hit endpoint")
+        return Response(status=status.HTTP_200_OK)
+        
 
 class LoginView(APIView):
     """View for user login"""
@@ -74,6 +84,8 @@ class LoginView(APIView):
 
 class UserSearch(APIView):
     """Endpoint for searching users"""
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, queryStr): 
         users = User.objects.filter(name__startswith=queryStr)
         serializer = UserSerializer(users, many=True)
@@ -84,6 +96,8 @@ class GameHistory(APIView):
     """
     Endpoint for game history for a user
     """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, id):
         """
         Grab all finished games for user with given id
@@ -100,7 +114,7 @@ class GameHistory(APIView):
             _status=Game.GameStatus.IN_PROGRESS
         )
         games_played = finished_games.count()
-        num_won_games = finished_games.filter(game_to_user__winner=True).count()
+        num_won_games = finished_games.filter(game_to_user__user=user, game_to_user__winner=True).count()
         serializer = GameSerializerPlayer(finished_games.order_by('date_played')[0:10], many=True)
         data = { RESULTS: serializer.data, WINS: num_won_games,  GAMES_PLAYED: games_played }
         return Response(data=data, status=status.HTTP_200_OK)

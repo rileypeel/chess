@@ -38,27 +38,27 @@ export const pieces = {
 }
 
 export const pieceBySymbol = {
-  ['p']: {
+  'p': {
     [WHITE]: { type: 'pawn', symbol: 'p', image: whitePawnImg, colour: WHITE },
     [BLACK]: { type: 'pawn', symbol: 'p', image: blackPawnImg, colour: BLACK }
   },
-  ['R']: {
+  'R': {
     [WHITE]: { type: 'rook', symbol: 'R', image: whiteRookImg, colour: WHITE },
     [BLACK]: { type: 'rook', symbol: 'R', image: blackRookImg, colour: BLACK }
   },
-  ['N']: {
+  'N': {
     [WHITE]: { type: 'knight', symbol: 'N', image: whiteKnightImg, colour: WHITE },
     [BLACK]: { type: 'knight', symbol: 'N', image: blackKnightImg, colour: BLACK }
   },
-  ['B']: {
+  'B': {
     [WHITE]: { type: 'bishop', symbol: 'B', image: whiteBishopImg, colour: WHITE },
     [BLACK]: { type: 'bishop', symbol: 'B', image: blackBishopImg, colour: BLACK }
   },
-  ['Q']: {
+  'Q': {
     [WHITE]: { type: 'queen', symbol: 'Q', image: whiteQueenImg, colour: WHITE },
     [BLACK]: { type: 'queen', symbol: 'Q', image: blackQueenImg, colour: BLACK }
   },
-  ['K']: {
+  'K': {
     [WHITE]: { type: 'king', symbol: 'K', image: whiteKingImg, colour: WHITE },
     [BLACK]: { type: 'king', symbol: 'K', image: blackKingImg, colour: BLACK }
   }
@@ -88,6 +88,7 @@ export const ACCEPT_INVITE = 'invite_accepted'
 export const INVITE_RESPONSE = 'invite_response'
 export const MOVE_RESPONSE = 'move_response'
 export const REQUEST_UPDATE_TIME = 'game_update_time'
+export const GAME_RESIGN = 'game_resign'
 
 //notification removed by
 export const CLICK = 'click'
@@ -95,3 +96,8 @@ export const CLICK = 'click'
 //timer keys 
 export const OPPONENT = 'opponent'
 export const ME = 'me'
+
+export const RESIGN = 'resign'
+export const CHECKMATE = 'checkmate'
+export const STALEMATE = 'stalemate'
+export const TIMEOUT = 'timeout'

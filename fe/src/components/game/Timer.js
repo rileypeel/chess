@@ -11,7 +11,7 @@ const Timer = props => {
   } 
   useInterval(() => {
     props.setTime(props.time - 1, props.timeKey, props.id)
-  }, 1000, run)
+  }, run)
 
   const formatTime = time => {
     const seconds = time % 60

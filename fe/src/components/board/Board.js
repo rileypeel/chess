@@ -1,4 +1,4 @@
-import React, { isValidElement } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import Square from './Square'
 import '../App.css'
@@ -10,14 +10,15 @@ import { move, selectSquare, unselectSquare } from '../../actions/game'
 const Board = props => {
   const gameData = props.game
   const onSquareClick = position => {
-      const tryToSelect = (square) => {
-        if (square) {
-          if (gameData.myColour === square.piece.colour)  {
-            props.select(position, props.id)
-          }
+    const tryToSelect = (square) => {
+      if (square) {
+        if (gameData.myColour === square.piece.colour)  {
+          props.select(position, props.id)
         }
       }
-      const square = gameData.board[position.row][position.col]
+    }
+    const square = gameData.board[position.row][position.col]
+    if (!props.gameOver){
       if (!gameData.selectedSquare) {
         tryToSelect(square)
       } else {
@@ -37,6 +38,7 @@ const Board = props => {
         }
       }
     }
+  }
   var squares = gameData.board.map(
     (boardRow, rowIndex) => boardRow.map((piece, colIndex) => <Square
         key={`r${rowIndex}c${colIndex}`}
@@ -62,7 +64,8 @@ const Board = props => {
 const mapStateToProps = (state, ownProps) => {
   const id = ownProps.id
   return {
-    game: state.game[id].game
+    game: state.game[id].game,
+    gameOver: state.game[id].game.gameOver
   }
 }
 

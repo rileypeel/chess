@@ -26,6 +26,7 @@ GAME_LOAD_MOVES = 'game_load_moves'
 GROUP_MESSAGE = 'group.message'
 SINGLE_MESSAGE = 'single.message'
 ADD_GAME = 'add.game'
+REMOVE_GAME = 'remove.game'
 CLIENT_SEND = 'send.message'
 
 # client message types
@@ -44,6 +45,7 @@ CLIENT_TYPE_NEW_CHAT_MESSAGE = 'opponent_message'
 CLIENT_TYPE_OPPONENT_MOVE = 'opponent_move'
 CLIENT_TYPE_START_GAME = 'start_game'
 CLIENT_TYPE_UPDATE_TIME = 'update_time'
+CLIENT_TYPE_MOVE_RESPONSE = 'move_response'
 CLIENT_TYPE = 'type'
 
 # Fields for data being sent to client

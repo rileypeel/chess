@@ -120,7 +120,7 @@ export const search = (searchStr) => {
 export const sendInvite = (inviteObj) => {
   return dispatch => {
     return api.sendInvite(inviteObj).then((status) => {
-      if (status == 201) {
+      if (status === 201) {
       } 
     })
   }

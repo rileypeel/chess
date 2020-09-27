@@ -36,7 +36,8 @@ const mapStateToProps = (state) => {
   return {
     name: state.user.name,
     rating: state.user.rating,
-    goToGame: state.ui.goToGame
+    goToGame: state.ui.goToGame,
+    isauth: state.user.isAuthenticated
   }
 }
 

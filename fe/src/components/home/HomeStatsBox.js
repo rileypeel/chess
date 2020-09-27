@@ -12,8 +12,8 @@ const HomeStatsBox = props => {
   }, [props.userId])
 
   const results = props.gameHistory && props.gameHistory.map(
-    gameResult => {
-      return (<div className="flex-row" style={{ justifyContent: "space-between", margin: "5px" }}>
+    (gameResult, index) => {
+      return (<div key={index} className="flex-row" style={{ justifyContent: "space-between", margin: "5px" }}>
         <div>
           { gameResult.won ? 'Win' : 'Loss' }
         </div>
@@ -29,7 +29,9 @@ const HomeStatsBox = props => {
       {props.gameHistory ? (
         <div>
           <h3>Wins: {props.wins} Losses: {props.gamesPlayed - props.wins}</h3>
-          {results}
+          <div className='game-display'>
+            {results}
+          </div>
         </div>
       ) : (<Loader inline={'centered'} active/>) 
       }

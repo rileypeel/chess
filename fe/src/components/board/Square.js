@@ -10,8 +10,8 @@ const Square = props => {
   const piece = square ? square.piece : null
   const squareClasses = `square square-hover ${squareColor ? "light-grey" : ""} ${selected ? "selected" : ""}`
   return (
-    <div onHover onClick={() => props.onSquareClick(props.position)} className={squareClasses}>
-      {piece ? <img src={piece.image}/> : ''} 
+    <div onClick={() => props.onSquareClick(props.position)} className={squareClasses}>
+      {piece ? <img alt={"chess piece"} src={piece.image}/> : ''} 
     </div>
   )
 }

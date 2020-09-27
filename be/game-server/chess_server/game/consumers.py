@@ -38,6 +38,7 @@ def game_timeout_callback(game_id, player_id):
         players[1].timeout = True
         players[1].save()
     game.status = Game.GameStatus.TIMEOUT
+    game.save()
 
 def cancel_timeout(game_id, player_id):
     """
@@ -111,14 +112,17 @@ class ChessConsumer(JsonWebsocketConsumer):
         subtype_str = type_str[len(controller_type) + 1:]
         func = None
         if controller_type == constants.CONTROLLER_TYPE_GAME:
+            print("in dispatch")
             print(message[constants.GAME_ID])
+            print(message)
+            print("end dispatch")
             game_controller = self.get_controller(message[constants.GAME_ID])
             if not game_controller:
                 self.send_message({
                     constants.CONTENT: {
                         constants.CLIENT_TYPE: constants.CLIENT_TYPE_ERROR,
                         constants.CLIENT_ERROR_MESSAGE: f"Error retrieving game.",
-                        constants.GAME_ID: message[constants.GAME_ID]
+                        constants.GAME_ID: str(message[constants.GAME_ID])
                     }
                 })
                 return
@@ -253,8 +257,6 @@ class GameController:
             self.chess_engine.load_move(m) 
             move_from, move_to = m.get_move()
             move_list.append({
-                constants.MOVE_FROM: move_from,
-                constants.MOVE_TO: move_to,
                 constants.NOTATION: m.notation
             })
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
@@ -347,9 +349,18 @@ class GameController:
             self.my_player.refresh_from_db()
             self.my_player.turn = False
             self.my_player.save()
-            Move.objects.save_move(self.chess_engine.history[-1], self.game)
-
+            my_move = Move.objects.save_move(self.chess_engine.history[-1], self.game)
+            async_to_sync(get_channel_layer().send)(self.user.channel_name, {
+                constants.TYPE: constants.CLIENT_SEND,
+                constants.CONTENT: {
+                    constants.TYPE: constants.CLIENT_TYPE_MOVE_RESPONSE,
+                    constants.NOTATION: my_move.notation,
+                    constants.GAME_ID: str(self.game.id)
+                }
+            })
             if self.chess_engine.status != IN_PROGRESS:
+                print("game is over ")
+                print(self.chess_engine.status)
                 self.game.refresh_from_db()
                 self.game.status = self.chess_engine.status
                 self.game.save()
@@ -402,8 +413,9 @@ class GameController:
         })
         
         self.chess_engine.load_move(last_move)
-        self.my_player.turn = True
-        self.my_player.save()
+        if self.chess_engine.status == IN_PROGRESS:
+            self.my_player.turn = True
+            self.my_player.save()
         
     def update_time(self, **kwargs):
         """
@@ -429,6 +441,7 @@ class GameController:
         """
         Handle client sending a resign message
         """
+        print("in resign")
         self.my_player.resigned = True
         self.my_player.save()
         self.game.status = Game.GameStatus.RESIGN
@@ -440,7 +453,10 @@ class GameController:
         client
         """
         self.game.refresh_from_db()
+        print("REFRESH IN STATUS UPDATE")
         self.my_player.refresh_from_db()
+        print("REFRESH IN STATUS UPDATE")
+        cancel_timeout(self.my_player.id, self.game.id)
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
             constants.CONTENT: {
@@ -450,8 +466,9 @@ class GameController:
                 constants.GAME_ID: str(self.game.id)     
             }
         })
+
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
-            constants.TYPE: constants.CLIENT_SEND,
+            constants.TYPE: constants.REMOVE_GAME,
             constants.GAME_ID: str(self.game.id) 
         })
 

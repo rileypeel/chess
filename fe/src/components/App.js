@@ -14,7 +14,7 @@ import 'animate.css'
 import WebSocketConnection from './utils/WebSocketConnection'
 import PrivateRoute from './utils/PrivateRoute'
 import './App.css'
-import { HOME, LOGIN, USER, GAME } from '../constants/app'
+import { HOME, LOGIN, GAME } from '../constants/app'
 
 const App = () => (
   <Provider store={store}>

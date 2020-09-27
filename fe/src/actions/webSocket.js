@@ -11,6 +11,7 @@ export const SEND_CHAT_MESSAGE = 'SEND_CHAT_MESSAGE'
 export const SEND_RESIGN = 'SEND_RESIGN'
 export const UPDATE_TIMES = 'UPDATE_TIMES'
 
+export const sendResign = gameId => ({ type: SEND_RESIGN, gameId })
 export const gameWSConnected = () => ({ type: GAME_WS_CONNECTED })
 export const sendMove = (from, to, gameId) => ({ type: SEND_MOVE, from, to, gameId })
 export const connectWS = host => ({ type: CONNECT_WS, host })
