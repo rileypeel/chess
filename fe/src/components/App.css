@@ -49,6 +49,7 @@
 
 .game-display {
   overflow-y: scroll;
+  height: 150px
 }
 
 .game-view {
