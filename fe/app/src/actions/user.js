@@ -42,7 +42,6 @@ export function fetchUser() {
   return dispatch => {
     return api.fetchUser()
       .then(response => {
-        console.log(response)
         dispatch({ type: LOGIN_USER, ...response })
         dispatch(setAttemptedFetch(true))
       })
