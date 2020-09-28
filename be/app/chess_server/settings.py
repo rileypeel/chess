@@ -20,12 +20,13 @@ sys.path.insert(0, f'{BASE_DIR}/game/utils')
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ab6ia6t-v2t1u=8hg_g3jf(^9&=pyx@bqc#u01*541c(7f755y'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1']
+
 
 SESSION_COOKIE_HTTP_ONLY = False
 CORS_ORIGIN_ALLOW_ALL = False
@@ -93,10 +94,14 @@ WSGI_APPLICATION = 'chess_server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': os.environ.get('DB_HOST', 'db'),
+        'NAME': os.environ.get('DB_NAME', 'app'),
+        'USER': os.environ.get('DB_USER', 'testuser'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'testpassword1234')
     }
 }
+
 
 
 # Password validation

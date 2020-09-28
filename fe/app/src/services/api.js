@@ -1,3 +1,4 @@
+//const BASE_URL = 'http://0.0.0.0:8000/'
 const BASE_URL = 'http://localhost:8000/'
 const FETCH_USER = `${BASE_URL}user/me/`
 const LOGIN_URL = `${BASE_URL}user/login/`
@@ -17,7 +18,7 @@ function getCookie(name) {
 const httpPost = (url, body) => httpRequest(url, { method: 'POST', credentials: 'include', headers: header(), body: JSON.stringify(body) })
 
 const header = () => (new Headers({
-  'Content-Type':'application/json',
+  'Content-Type': 'application/json',
   "X-CSRFToken": getCookie("csrftoken")
 }))
 

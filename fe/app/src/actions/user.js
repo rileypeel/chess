@@ -64,7 +64,8 @@ export function loginUser(userCredentials) {
     return api.loginUser(userCredentials)
       .then(response => {
         dispatch({ type: LOGIN_USER, ...response })
-        if (!response.id) {
+        console.log(response)
+        if (response && !response.id) {
           notify("Error", "Login Failed", { type: "danger" })
         }
       })

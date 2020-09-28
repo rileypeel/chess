@@ -15,7 +15,7 @@ export const HOME = '/home'
 export const LOGIN = '/login'
 export const USER = '/user'
 export const GAME = '/game'
-export const WS_HOST = 'ws://localhost:8000/chess-socket/'
+export const WS_HOST = 'ws://0.0.0.0:8000/chess-socket/'
 
 export const REGULAR = 'regular'
 export const EN_PASSANT = 'en_passant'
