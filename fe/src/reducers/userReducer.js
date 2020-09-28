@@ -40,7 +40,7 @@ function userReducer(state = initialState, action) {
     case actions.REGISTER_USER:
       return { ...state, registerResult: { success: true }}
     case actions.LOGOUT_USER:
-      console.log("in logout")
+      
       return { ...state, id: null, name: null, email: null, isAuthenticated: false }
     case actions.UPDATE_EMAIL_FIELD:
       return { ...state, authFields: { 
@@ -77,8 +77,8 @@ function userReducer(state = initialState, action) {
       return { ...state, attemptedFetch: action.value }
     case actions.SET_HISTORY:
       const me = state.id
-      console.log(state)
-      console.log(action)
+      
+      
       if (!action.results) return state
       return {
         ...state,

@@ -24,7 +24,7 @@ function uiReducer(state=initialState, action) {
       case actions.SET_ACCEPT_MODAL:
         return { ...state, acceptModalOpen: action.value }
       case actions.SET_GO_TO_GAME:
-        console.log(action)
+        
         return { ...state, goToGame: action.gameId }
       default:
         return state

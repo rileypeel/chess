@@ -136,9 +136,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_k_factor(self):
         """Method to determine a players k factor"""
-        print("filter in k factor")
         num_games = Game.objects.filter(players__id=self.id).count()
-        print("filter in k factor")
         if num_games < 30:
             return 25
         if self.rating < 2400:
@@ -146,7 +144,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return 10
 
     def save(self, *args, **kwargs):
-        print("SAVING USER")
         super().save(*args, **kwargs)
 
 class GameInvite(models.Model):
@@ -286,34 +283,24 @@ class Game(models.Model):
             player1.draw, player2.draw = True
 
         else:
-            moves = Move.objects.filter(game=self).order_by(
-                '-move_number')
-            print("in set winner checking moves")
-            print(moves)
+            moves = Move.objects.filter(game=self).order_by('-move_number')
             if moves:
                 if moves[0].colour is player1.colour:
-                    print("setting a winner")
                     player1.winner = True
                 else: 
-                    print("setting a winner else")
                     player2.winner = True
-        print("first save")
         player1.save()
-        print("first save done")
-        print("second save")
         player2.save()
-        print("second save done")
+        
         player1.user.update_rating(new_status, player1.winner, player2.user.rating)
         player2.user.update_rating(new_status, player2.winner, player1.user.rating)
         player1.user.save()
         player2.user.save()
-        print("DONE SET WINNER!!!")
 
     def save(self, *args, **kwargs):
         """
         Override save
         """
-        print("GAME SAVE CALLED")
         super().save(*args, **kwargs)
         callback = getattr(self, 'status_callback', None)
         if callback:
@@ -327,7 +314,7 @@ class Player(models.Model):
     """Association object for many to many between players and game"""
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='user_to_game')
     game = models.ForeignKey('Game', on_delete=models.CASCADE, related_name='game_to_user')
-    time = models.DecimalField(default=180.0, decimal_places=2, max_digits=6)
+    time = models.DecimalField(default=60.0, decimal_places=2, max_digits=6)
     _turn = models.BooleanField(default=False)
     colour = models.BooleanField()
     winner = models.BooleanField(default=False)
@@ -364,13 +351,7 @@ class Player(models.Model):
             self.turn_started_timestamp = time_now
             if self.time < 0:
                 self.time = 0
-
-    def save(self, *args, **kwargs):
-        print("before super")
-        super().save(*args, **kwargs)
-        print("after super")
-        print(f"saving player {self.user.name}")
-        print(f"player winner {self.winner}")
+            
 
 class Move(models.Model):
     """Model for a move made in a game"""

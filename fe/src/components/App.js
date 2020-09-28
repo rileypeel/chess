@@ -1,6 +1,6 @@
 import React from 'react'
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
 import store from '../reducers/index'
 import Home from './home/Home'
 import Login from './login/Login'
@@ -21,9 +21,6 @@ const App = () => (
     <Router>
       <ReactNotification/>
       <Switch>
-        <Route path={'/gamefornow'}> 
-          <Game/>
-        </Route>
         <Route path={LOGIN}>
           <Login/>
         </Route>

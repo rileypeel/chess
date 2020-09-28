@@ -9,7 +9,7 @@ import '../App.css'
 
 const MenuBar = (props) => {
   const logoutClicked = () => {
-    console.log('log out clicked')
+    
     props.logout()
   }
   return (

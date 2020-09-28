@@ -26,17 +26,11 @@ def game_timeout_callback(game_id, player_id):
     Callback to change game status when a players time
     runs out
     """
-
+    
     game = Game.objects.get(id=game_id)
-    players = Player.objects.filter(game=game)
-    if players[0].id == player_id:
-        print(f"{players[0].user.name} has timed out")
-        players[0].timeout = True
-        players[0].save()
-    if players[1].id == player_id:
-        print(f"{players[1].user.name} has timed out")
-        players[1].timeout = True
-        players[1].save()
+    player = Player.objects.get(game=game, id=player_id)
+    player.timeout = True
+    player.save()
     game.status = Game.GameStatus.TIMEOUT
     game.save()
 
@@ -44,12 +38,11 @@ def cancel_timeout(game_id, player_id):
     """
     Helper func to get timer thread for a player and cancel it
     """
+    
     for th in threading.enumerate():
-        if isinstance(th, threading.Timer):
-            if (getattr(th, 'game_id', None) == game_id
-                and getattr(th, 'player_id', None) == player_id):
-                print("timeout cancelled")
-                th.cancel()
+        if (getattr(th, 'game_id', None) == game_id and getattr(th, 'player_id', None) == player_id):
+            
+            th.cancel()
 
 class ChessConsumer(JsonWebsocketConsumer):
 
@@ -58,8 +51,8 @@ class ChessConsumer(JsonWebsocketConsumer):
         self.game_controllers = [] 
         self.invite_controller = InviteController(self.scope['user'])
         self.channel_layer = get_channel_layer()
-        self.scope['user'].online = True #TODO check to make sure not anon user
-        self.scope['user'].channel_name = self.channel_name #TODO maybe pass this down to controllers instead
+        self.scope['user'].online = True 
+        self.scope['user'].channel_name = self.channel_name 
         self.scope['user'].save()
         self.load_active_games()
     
@@ -112,10 +105,6 @@ class ChessConsumer(JsonWebsocketConsumer):
         subtype_str = type_str[len(controller_type) + 1:]
         func = None
         if controller_type == constants.CONTROLLER_TYPE_GAME:
-            print("in dispatch")
-            print(message[constants.GAME_ID])
-            print(message)
-            print("end dispatch")
             game_controller = self.get_controller(message[constants.GAME_ID])
             if not game_controller:
                 self.send_message({
@@ -165,7 +154,7 @@ class ChessConsumer(JsonWebsocketConsumer):
         try:
             game = Game.objects.get(id=game_id)
         except Game.DoesNotExist:
-            print(f"Error: game with id: {game_id} not found.")
+            print("Error game does not exist.")
         self.game_controllers.append(GameController(game, self.scope['user']))
 
     def remove_game(self, message):
@@ -225,6 +214,10 @@ class GameController:
         """
         Send game details down to client
         """
+        async_to_sync(get_channel_layer().group_add)(
+            self.game.group_channel_name,
+            self.user.channel_name
+        )
         self.send_game(constants.CLIENT_TYPE_LOAD_GAME)
         self.load_moves()
         self.load_board()
@@ -290,11 +283,10 @@ class GameController:
         Send down valid moves from chess engine to the client
         """
         self.my_player.update_time()
-        self.opponent.update_time()
         self.my_player.save()
-        self.opponent.save()
         self.my_player.refresh_from_db()
         self.opponent.refresh_from_db()
+        
         self.turn_timer = threading.Timer(
            int(self.my_player.time),
            game_timeout_callback,
@@ -302,7 +294,7 @@ class GameController:
         )
         self.turn_timer.game_id = self.game.id
         self.turn_timer.player_id = self.my_player.id
-        print(f"timer thread set for {self.my_player.user.name} for {int(self.my_player.time)}")
+        
         self.turn_timer.start()
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
@@ -344,7 +336,7 @@ class GameController:
                 }
             })
         else:
-            print(f"timer cancelled for {self.my_player.user.name}")
+            
             self.turn_timer.cancel()
             self.my_player.refresh_from_db()
             self.my_player.turn = False
@@ -359,8 +351,6 @@ class GameController:
                 }
             })
             if self.chess_engine.status != IN_PROGRESS:
-                print("game is over ")
-                print(self.chess_engine.status)
                 self.game.refresh_from_db()
                 self.game.status = self.chess_engine.status
                 self.game.save()
@@ -441,7 +431,7 @@ class GameController:
         """
         Handle client sending a resign message
         """
-        print("in resign")
+        
         self.my_player.resigned = True
         self.my_player.save()
         self.game.status = Game.GameStatus.RESIGN
@@ -453,10 +443,10 @@ class GameController:
         client
         """
         self.game.refresh_from_db()
-        print("REFRESH IN STATUS UPDATE")
+        
         self.my_player.refresh_from_db()
-        print("REFRESH IN STATUS UPDATE")
-        cancel_timeout(self.my_player.id, self.game.id)
+        
+        cancel_timeout(self.game.id, self.my_player.id)
         async_to_sync(get_channel_layer().send)(self.user.channel_name, {
             constants.TYPE: constants.CLIENT_SEND,
             constants.CONTENT: {

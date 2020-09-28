@@ -48,7 +48,7 @@ const socketMiddleware = () => {
         )
         break
       case constants.GAME_STATUS_UPDATE:
-        console.log(payload)
+        
         store.dispatch(gameActions.setMyTurn(false, payload.game_id))
         store.dispatch(gameActions.setGameOver(true, payload.game_id))
         const callback = () => store.dispatch(gameActions.removeGame(payload.game_id))
@@ -88,16 +88,17 @@ const socketMiddleware = () => {
       case constants.ERROR:
         break
       case constants.START_TURN:
+        
         store.dispatch(gameActions.loadValidMoves(payload.valid_moves, payload.game_id))
         store.dispatch(gameActions.setMyTurn(true, payload.game_id))
         store.dispatch(
           gameActions.setTime(
             Math.trunc(payload.opponent_time), 
-            'opponent',
+            constants.OPPONENT,
             payload.game_id
           )
         )
-        store.dispatch(gameActions.setTime(Math.trunc(payload.my_time), 'me', payload.game_id))
+        store.dispatch(gameActions.setTime(Math.trunc(payload.my_time), constants.ME, payload.game_id))
         break
       case constants.START_GAME:
         notify(
@@ -135,7 +136,7 @@ const socketMiddleware = () => {
         store.dispatch(gameActions.addMoveNotation(moveNotation, payload.game_id))
         break
       case constants.MOVE_RESPONSE:
-        console.log("in move response!!")
+        
         store.dispatch(gameActions.addMoveNotation(payload.notation, payload.game_id))
         
         break
@@ -204,7 +205,6 @@ return store => next => action => {
         break
 
       case actions.SEND_RESIGN:
-        console.log("sending resign....")
         socket.send(JSON.stringify({
           type: constants.GAME_RESIGN,
           game_id: action.gameId

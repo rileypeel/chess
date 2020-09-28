@@ -30,7 +30,7 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     def get_object(self):
         """Retrieve and return authenticated user"""
-        print("in me view")
+        
         return self.request.user
 
 
@@ -48,7 +48,7 @@ class CreateGameInvite(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
-        print(serializer.errors)
+        
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutView(APIView):
@@ -58,7 +58,7 @@ class LogoutView(APIView):
     authentication_classes = (authentication.SessionAuthentication,)
     def get(self, request):
         logout(request)
-        print("hit endpoint")
+        
         return Response(status=status.HTTP_200_OK)
         
 
@@ -68,17 +68,17 @@ class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email', None)
         password = request.data.get('password', None)
-        print("here is the data")
-        print(request.data)
-        print(email)
-        print(password)
+        
+        
+        
+        
         user = authenticate(request, email=email, password=password)
         if user is not None:
             
             login(request, user)
             serializer = UserSerializer(user) 
             return Response(data=serializer.data, status=status.HTTP_200_OK)
-        print("failed")
+        
         return Response(data={}, status=status.HTTP_200_OK)
 
 
@@ -105,7 +105,7 @@ class GameHistory(APIView):
         try:
             user = User.objects.get(id=id)
         except User.DoesNotExist:
-            print(f"Error user with id: {id} not found.")
+            
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         finished_games = Game.objects.filter(

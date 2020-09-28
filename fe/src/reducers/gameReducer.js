@@ -56,7 +56,7 @@ const getBoard = boardData => {
   }
   
   boardData.forEach(pieceData => {
-    console.log(pieceData.position)
+    
     board[pieceData.position[1]][pieceData.position[0]] = {
       piece: {
         ...constants.pieceBySymbol[pieceData.type][pieceData.colour],
@@ -64,7 +64,7 @@ const getBoard = boardData => {
       moves: []
     }
   })
-  console.log(board)
+  
   return board
 }
 
@@ -116,7 +116,7 @@ function gameReducer(state = {}, action) {
       return state
 
     case actions.LOAD_BOARD:
-      console.log(action)
+      
       const newBoard = getBoard(action.board)
       return {
         ...state,
@@ -221,7 +221,7 @@ function gameReducer(state = {}, action) {
       }
      
     case actions.LOAD_VALID_MOVES:
-      console.log(action)
+      
       const validMoveBoard = copyBoard(state[action.gameId].game.board)
       action.validMoves.forEach(item => {
         var passant = null
@@ -347,7 +347,7 @@ function gameReducer(state = {}, action) {
       }
 
     case actions.SET_GAME_OVER:
-      console.log(action)
+      
       return {
         ...state,
         [action.gameId]: {
