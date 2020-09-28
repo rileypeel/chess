@@ -1,0 +1,6 @@
+FUNCTION = 'function'
+ARGS = 'args'
+KWARGS = 'kwargs'
+CALLBACK = 'callback'
+RESIGN = 'resign'
+TIMEOUT = 'timeout'

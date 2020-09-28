@@ -1,14 +1,18 @@
 import React from 'react'
 import { Route, Redirect } from "react-router-dom";
 import { connect } from 'react-redux';
+import { fetchUser } from '../../actions/user'
 import { LOGIN } from '../../constants/app'
 
-const PrivateRoute = ({ children, isAuthenticated, ...rest }) => {
+const PrivateRoute = ({ children, getUser, fetchComplete, isAuthenticated, ...rest }) => {
+  React.useEffect(() => { 
+    getUser()
+  }, []) 
   return (
     <Route
       { ...rest }
       render={({ location }) =>
-        isAuthenticated ? (
+        (isAuthenticated || !fetchComplete) ? (
           children
         ) : (
           <Redirect
@@ -23,10 +27,17 @@ const PrivateRoute = ({ children, isAuthenticated, ...rest }) => {
   )
 }
 
-const mapStateToProps = (state) => {
+const mapDispatchToProps = dispatch => {
   return {
-    isAuthenticated: state.user.isAuthenticated
+    getUser: () => dispatch(fetchUser())
   }
 }
 
-export default connect(mapStateToProps, null)(PrivateRoute)
+const mapStateToProps = state => {
+  return {
+    isAuthenticated: state.user.isAuthenticated,
+    fetchComplete: state.user.attemptedFetch
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PrivateRoute)

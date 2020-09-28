@@ -9,6 +9,7 @@ const initialState = {
   name: null,
   email: null,
   id: null,
+  attemptedFetch: false,
   isAuthenticated: false,
   registerResult: null,
   wsInvite: null,
@@ -19,11 +20,11 @@ const initialState = {
     value: ''
   },
   selectedUser: null,
-  inviteMessage: ''
+  inviteMessage: '',
+  gameHistory: null
 }
 
 function userReducer(state = initialState, action) {
-  
   switch (action.type) {
     case actions.LOGIN_USER:
       if (!action.id) {
@@ -33,12 +34,14 @@ function userReducer(state = initialState, action) {
         id: action.id,
         email: action.email,
         name: action.name,
+        rating: action.rating,
         isAuthenticated: true 
       } 
     case actions.REGISTER_USER:
       return { ...state, registerResult: { success: true }}
     case actions.LOGOUT_USER:
-      return { ...state, name: null, email: null, isAuthenticated: false }
+      
+      return { ...state, id: null, name: null, email: null, isAuthenticated: false }
     case actions.UPDATE_EMAIL_FIELD:
       return { ...state, authFields: { 
         ...state.authFields,
@@ -70,6 +73,29 @@ function userReducer(state = initialState, action) {
       return { ...state, inviteMessage: action.value}
     case actions.SET_SELECTED_USER:
       return { ...state, selectedUser: action.selectedUser }
+    case actions.SET_ATTEMPTED_FETCH:
+      return { ...state, attemptedFetch: action.value }
+    case actions.SET_HISTORY:
+      const me = state.id
+      
+      
+      if (!action.results) return state
+      return {
+        ...state,
+        gameHistory: action.results.map(item => {
+          var opponent = item.game_to_user[0]
+          if (item.game_to_user[0].user.id === me) {
+            opponent = item.game_to_user[1]
+          }
+          return {
+            datePlayed: item.date_played,
+            opponent: opponent.user.name,
+            won: !opponent.winner
+          }
+        }),
+        totalGames: action.games_played,
+        totalWins: action.wins
+      }
     default:
       return state
   }

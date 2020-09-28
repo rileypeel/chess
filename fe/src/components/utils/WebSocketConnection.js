@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Redirect, useHistory } from 'react-router-dom'
 import { connectWS} from '../../actions/webSocket'
 import { WS_HOST} from '../../constants/app'
 
-const WebSocketConnection = props => {
+const WebSocketConnection = (props) => {
 
   useEffect(() => {
     props.connectWS(WS_HOST)

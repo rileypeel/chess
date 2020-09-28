@@ -3,80 +3,78 @@ import { connect } from 'react-redux'
 import Square from './Square'
 import '../App.css'
 import { WHITE } from '../../constants/app'
-import { isPosIn } from '../../services/helpers'
+import { isValidMove } from '../../services/helpers'
 import { sendMove } from '../../actions/webSocket'
 import { move, selectSquare, unselectSquare } from '../../actions/game'
 
 const Board = props => {
+  const gameData = props.game
   const onSquareClick = position => {
-    //if nothing selected
-      // select if it is one of your pieces
-    // if piece is seleected 
-      // move if it is a valid move
-      // else unselect
-      const tryToSelect = (square) => {
-        if (square) {
-          if (props.myColour === square.piece.colour)  {
-            props.select(position)
-          }
-        }
-      }
-      const square = props.board[position.row][position.col]
-      if (!props.selectedSquarePosition) {
-        tryToSelect(square)
-      } else {
-        
-        if (props.myTurn) {
-          
-          const pieceToMove = props.board[props.selectedSquarePosition.row][props.selectedSquarePosition.col]
-          if (isPosIn(position, pieceToMove.moves)) { // seperate this into a seperate function
-            
-            props.move(props.selectedSquarePosition, position)
-            props.sendMove(props.selectedSquarePosition, position)
-          } else {
-            props.unselect() //add a select if this position has a piece of yours
-            tryToSelect(square)
-          }
-        } else {
-          props.unselect()
+    const tryToSelect = (square) => {
+      if (square) {
+        if (gameData.myColour === square.piece.colour)  {
+          props.select(position, props.id)
         }
       }
     }
-  var squares = props.board.map(
+    const square = gameData.board[position.row][position.col]
+    if (!props.gameOver){
+      if (!gameData.selectedSquare) {
+        tryToSelect(square)
+      } else {
+        if (gameData.myTurn) {
+          const pieceToMove = gameData.board[gameData.selectedSquare.row][gameData.selectedSquare.col]
+          const moveType = isValidMove(pieceToMove, position)
+          if (moveType) {  
+            props.move(pieceToMove, gameData.selectedSquare, position, moveType, props.id)
+            props.sendMove(gameData.selectedSquare, position, props.id)
+            props.unselect(props.id)
+          } else {
+            props.unselect(props.id)
+            tryToSelect(square)
+          }
+        } else {
+          props.unselect(props.id)
+        }
+      }
+    }
+  }
+  var squares = gameData.board.map(
     (boardRow, rowIndex) => boardRow.map((piece, colIndex) => <Square
         key={`r${rowIndex}c${colIndex}`}
         position={{ col: colIndex, row: rowIndex }}
         onSquareClick={(position) => onSquareClick(position)}
+        myColour={gameData.myColour}
+        id={props.id}
       />
     )
   )
-  if (props.myColour === WHITE) {
+  if (gameData.myColour === WHITE) {
     squares = squares.reverse()
   }
   return (
     <div>
       <div className="board">
-        { squares }
+        {squares}
       </div>
     </div>
   )
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
+  const id = ownProps.id
   return {
-    board: state.game.board,
-    myColour: state.game.myColour,
-    selectedSquarePosition: state.game.selectedSquare,
-    myTurn: state.game.myTurn
+    game: state.game[id].game,
+    gameOver: state.game[id].game.gameOver
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    select: position => dispatch(selectSquare(position)),
-    unselect: () => dispatch(unselectSquare()),
-    move: (p1, p2) => dispatch(move(p1, p2)),
-    sendMove: (p1, p2) => dispatch(sendMove(p1, p2))
+    select: (position, id) => dispatch(selectSquare(position, id)),
+    unselect: id => dispatch(unselectSquare(id)),
+    move: (piece, p1, p2, type, id) => dispatch(move(piece, p1, p2, type, id)),
+    sendMove: (p1, p2, id) => dispatch(sendMove(p1, p2, id))
   }
 }
 

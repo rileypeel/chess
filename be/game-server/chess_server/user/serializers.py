@@ -3,12 +3,14 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from core.models import User, GameInvite, Game
 
+
+
 class UserSerializer(serializers.ModelSerializer):
 	"""Serializers for the users object"""
 
 	class Meta:
 		model = get_user_model()
-		fields = ('id', 'email', 'password', 'name', 'online')
+		fields = ('id', 'email', 'password', 'name', 'online', 'rating')
 		extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
 
 	def create(self, validated_data):

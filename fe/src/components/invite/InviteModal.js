@@ -7,7 +7,6 @@ import UserLabel from '../user/UserLabel'
 import '../App.css'
 
 const InviteModal = props => {
-
   const send = () => {
     const invite = {
       to_user: props.selectedUser.id,
@@ -15,27 +14,42 @@ const InviteModal = props => {
       message: props.message
     }
     props.sendInvite(invite)
+    props.setMessage('')
+    props.setOpen(false)
+  }
+
+  const cancel = () => {
+    props.setOpen(false)
+    props.setMessage('')
   }
   const name = props.selectedUser ? props.selectedUser.name : ''
+  const rating = props.selectedUser ? props.selectedUser.rating : ''
   return ( 
     <Modal
       onClose={() => props.setOpen(false)}
       onOpen={() => props.setOpen(true)}
       open={props.open}
     >
-      <Modal.Header style={{ textAlign: 'center', width: 'auto' }}>Send Invite</Modal.Header>
+      <Modal.Header style={{ textAlign: 'center', width: 'auto' }}>
+        Send Invite
+      </Modal.Header>
       <Modal.Content>
         <Modal.Description>
         </Modal.Description>
         <div style={{ display: "inlineBlock"}}>
-          To: <UserLabel style={{width: "auto"}} rating={1200} name={name}/>
+          To: <UserLabel style={{width: "auto"}} rating={rating} name={name}/>
         </div>
         <Form>
-          <Form.Field control={TextArea} onChange={(event) => props.setMessage(event.target.value)} value={props.message} placeholder="Message...." />
+          <Form.Field
+            control={TextArea}
+            onChange={(event) => props.setMessage(event.target.value)}
+            value={props.message}
+            placeholder="Message...."
+          />
         </Form>
       </Modal.Content>
       <Modal.Actions>
-        <Button color='black' onClick={() => props.setOpen(false)}>
+        <Button color='black' onClick={cancel}>
           Cancel
         </Button>
         <Button

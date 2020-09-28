@@ -1,10 +1,10 @@
 import React from 'react'
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
 import store from '../reducers/index'
-import Home from './Home'
+import Home from './home/Home'
 import Login from './login/Login'
-import User from './user/User'
+import GameController from './game/GameController'
 import Game from './game/Game'
 import MenuBar from './utils/MenuBar'
 import AcceptModal from './invite/AcceptModal'
@@ -14,16 +14,13 @@ import 'animate.css'
 import WebSocketConnection from './utils/WebSocketConnection'
 import PrivateRoute from './utils/PrivateRoute'
 import './App.css'
-import { HOME, LOGIN, USER, GAME } from '../constants/app'
+import { HOME, LOGIN, GAME } from '../constants/app'
 
 const App = () => (
   <Provider store={store}>
     <Router>
       <ReactNotification/>
       <Switch>
-        <Route path={'/gamefornow'}> //TODO TESTING REMOVE LATER
-          <Game/>
-        </Route>
         <Route path={LOGIN}>
           <Login/>
         </Route>
@@ -34,11 +31,8 @@ const App = () => (
             <PrivateRoute path={HOME}>
               <Home/>
             </PrivateRoute>
-            <PrivateRoute path={USER}>
-              <User/>
-            </PrivateRoute>
             <PrivateRoute path={GAME}>
-              <Game/>
+              <GameController/>
             </PrivateRoute>
           </WebSocketConnection>
         </Route>

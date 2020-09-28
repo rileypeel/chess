@@ -7,7 +7,6 @@ import { createStore, applyMiddleware } from 'redux'
 import socketReducer from './wsReducer'
 import socketMiddleware from '../middleware/wsMiddleware'
 
-
 const chessAppReducer = combineReducers({
   game: gameReducer,
   user: userReducer,

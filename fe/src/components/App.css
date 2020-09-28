@@ -4,6 +4,7 @@
   flex-direction: row;
 }
 
+
 .header {
   width: 100vw;
   height: 80px;
@@ -14,19 +15,59 @@
   font-size: 24px;
 }
 
-.view {
-  margin-left: 40px;
+.home-view {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.home-margin-top {
+  margin-top: 40px;
+}
+
+.stats-column {
+  text-align: center;
+}
+
+.home-label {
+  min-width: 201px;
+  margin-top: 10px;
+}
+.invite-column {
+  text-align: center;
+}
+
+.stats-box {
+  border-style: solid;
+  text-align: center;
+  height: 300px;
+  width: 25vw;
+  height: 200px;
+  
+  min-width: 200px;
+}
+
+.game-display {
+  overflow-y: scroll;
+  height: 150px
+}
+
+.game-view {
+  display: flex;
+  flex-direction: row;
+}
+
+.board-column {
+  margin: 10px;
+}
+
+.status-column {
+  margin: 10px;
 }
 
 .chat-container {
   width: 300px;
   height: 350px;
-  overflow-y: scroll;
-  border-style: solid;
-  border-width: 2px;
-  border-color: grey;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px 0 rgb(169,169,169);
 }
 
 .chat-header {
@@ -40,6 +81,8 @@
 .chat-messages {
   display: flex;
   flex-direction: column;
+  height: 275px;
+  overflow-y: scroll;
 }
 
 .chat-message {
@@ -49,14 +92,21 @@
 
 .chat-message-box {
   border-top: 2px;
+  
 }
 
-.chat-message-input {
+.chat-input {
   width: 100%;
+  margin-bottom: 0px;
   border: 0;
   outline: 0;
 }
 
+.chat-input-container {
+  position: sticky;
+  bottom: 0;
+  z-index: 1000;
+}
 
 .game-move-box {
   display: flex;
@@ -87,6 +137,14 @@
   margin: 10px;
 }
 
+.grey-box-shadow {
+  border-style: solid;
+  box-shadow: 0 2px 8px 0 rgb(169,169,169);
+  border-width: 1px;
+  border-radius: 3px;
+  border-color: grey;
+}
+
 .login-box {
   position: absolute;
   display: inline-block;
@@ -108,7 +166,6 @@
   text-align: center;
 }
 
-
 #login-button {
   margin: 10px;
   text-align: center;
@@ -119,10 +176,6 @@
 
 .login-page {
   background-color: green;
-}
-
-.square {
-  
 }
 
 .black {
@@ -154,8 +207,16 @@
   border-style: solid;
   border-width: 1px;
   border-color: black;
-  width: 640px;
+  width: 522px;
   display: grid;
-  grid-template-columns: 80px 80px 80px 80px 80px 80px 80px 80px;
-  grid-template-rows: 80px 80px 80px 80px 80px 80px 80px 80px;
+  grid-template-columns: 65px 65px 65px 65px 65px 65px 65px 65px;
+  grid-template-rows: 65px 65px 65px 65px 65px 65px 65px 65px;
+}
+
+.game-move-box {
+  height: 200px;
+}
+
+.game-status-box {
+  margin-left: 5px;
 }
