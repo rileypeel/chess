@@ -1,0 +1,28 @@
+version: "3.7"
+
+services:
+  be:
+    build:
+      context: ./be
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./be/app:/app
+    command: sh -c "python manage.py wait_for_db && python manage.py migrate && daphne -b 0.0.0.0 -p 8000 chess_server.asgi:application"
+    env_file: 
+      - ./.env
+    depends_on:
+      - db
+  db:
+    image: postgres:10-alpine
+    env_file:
+      - ./.env
+  fe:
+    build:
+      context: ./fe
+    ports:
+      - "80:80"
+    volumes:
+      - ./fe/app:/app
+      - /fe/app/node_modules
+    stdin_open: true
