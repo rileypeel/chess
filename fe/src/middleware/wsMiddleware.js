@@ -36,9 +36,11 @@ const socketMiddleware = () => {
           )
         )
         break
+
       case constants.LOAD_BOARD:
         store.dispatch(gameActions.loadBoard(payload.board, payload.game_id))
         break
+
       case constants.OPPONENT_MESSAGE: 
         store.dispatch(
           gameActions.addMessage(
@@ -47,8 +49,8 @@ const socketMiddleware = () => {
           )
         )
         break
+
       case constants.GAME_STATUS_UPDATE:
-        
         store.dispatch(gameActions.setMyTurn(false, payload.game_id))
         store.dispatch(gameActions.setGameOver(true, payload.game_id))
         const callback = () => store.dispatch(gameActions.removeGame(payload.game_id))
@@ -58,9 +60,11 @@ const socketMiddleware = () => {
       case constants.LOAD_MOVES:
         store.dispatch(gameActions.loadMoves(payload.move_list, payload.game_id))
         break
+
       case constants.LOAD_GAME:
         store.dispatch(gameActions.loadGame(payload.game, payload.me, payload.opponent))
         break
+
       case constants.LOAD_MESSAGES:
         const messages = payload.message
         messages.forEach(message => {
@@ -72,6 +76,7 @@ const socketMiddleware = () => {
           )
         })
         break
+
       case constants.INVITE_RECEIVED:
         const inviteFrom = payload.invite.from_user
         notify(
@@ -83,12 +88,12 @@ const socketMiddleware = () => {
           }
         )
         break
+
       case constants.INVITE_UPDATE:
         break
       case constants.ERROR:
         break
       case constants.START_TURN:
-        
         store.dispatch(gameActions.loadValidMoves(payload.valid_moves, payload.game_id))
         store.dispatch(gameActions.setMyTurn(true, payload.game_id))
         store.dispatch(
@@ -100,6 +105,7 @@ const socketMiddleware = () => {
         )
         store.dispatch(gameActions.setTime(Math.trunc(payload.my_time), constants.ME, payload.game_id))
         break
+
       case constants.START_GAME:
         notify(
           'Game Started',
@@ -111,6 +117,7 @@ const socketMiddleware = () => {
         store.dispatch(setGoToGame(payload.game.id))
         store.dispatch(gameActions.loadGame(payload.game, payload.me, payload.opponent))
         break
+
       case constants.OPPONENT_MOVE:
         const move = payload.move
         const moveNotation = payload.move.notation
@@ -135,11 +142,11 @@ const socketMiddleware = () => {
         }
         store.dispatch(gameActions.addMoveNotation(moveNotation, payload.game_id))
         break
+
       case constants.MOVE_RESPONSE:
-        
         store.dispatch(gameActions.addMoveNotation(payload.notation, payload.game_id))
-        
         break
+
       default:
         break 
     } 
@@ -210,6 +217,7 @@ return store => next => action => {
           game_id: action.gameId
         }))
         break
+        
       default:
         return next(action)
     }

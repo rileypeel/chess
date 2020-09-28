@@ -54,9 +54,7 @@ const getBoard = boardData => {
   for (var i = 0; i < 8; i++) {
     board.push([null, null, null, null, null, null, null, null])
   }
-  
   boardData.forEach(pieceData => {
-    
     board[pieceData.position[1]][pieceData.position[0]] = {
       piece: {
         ...constants.pieceBySymbol[pieceData.type][pieceData.colour],
@@ -64,7 +62,6 @@ const getBoard = boardData => {
       moves: []
     }
   })
-  
   return board
 }
 

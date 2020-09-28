@@ -291,7 +291,6 @@ class Game(models.Model):
                     player2.winner = True
         player1.save()
         player2.save()
-        
         player1.user.update_rating(new_status, player1.winner, player2.user.rating)
         player2.user.update_rating(new_status, player2.winner, player1.user.rating)
         player1.user.save()
@@ -322,7 +321,6 @@ class Player(models.Model):
     turn_started_timestamp = models.DecimalField(null=True, decimal_places=2, max_digits=14)
     resigned = models.BooleanField(default=False)
     timeout = models.BooleanField(default=False)
-
 
     @property
     def turn(self):

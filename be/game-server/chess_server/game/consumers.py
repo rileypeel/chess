@@ -26,7 +26,6 @@ def game_timeout_callback(game_id, player_id):
     Callback to change game status when a players time
     runs out
     """
-    
     game = Game.objects.get(id=game_id)
     player = Player.objects.get(game=game, id=player_id)
     player.timeout = True
@@ -431,7 +430,6 @@ class GameController:
         """
         Handle client sending a resign message
         """
-        
         self.my_player.resigned = True
         self.my_player.save()
         self.game.status = Game.GameStatus.RESIGN
