@@ -30,7 +30,6 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     def get_object(self):
         """Retrieve and return authenticated user"""
-        
         return self.request.user
 
 
@@ -68,13 +67,8 @@ class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email', None)
         password = request.data.get('password', None)
-        
-        
-        
-        
         user = authenticate(request, email=email, password=password)
         if user is not None:
-            
             login(request, user)
             serializer = UserSerializer(user) 
             return Response(data=serializer.data, status=status.HTTP_200_OK)

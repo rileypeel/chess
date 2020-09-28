@@ -42,6 +42,7 @@ export function fetchUser() {
   return dispatch => {
     return api.fetchUser()
       .then(response => {
+        console.log(response)
         dispatch({ type: LOGIN_USER, ...response })
         dispatch(setAttemptedFetch(true))
       })
@@ -64,7 +65,6 @@ export function loginUser(userCredentials) {
     return api.loginUser(userCredentials)
       .then(response => {
         dispatch({ type: LOGIN_USER, ...response })
-        console.log(response)
         if (response && !response.id) {
           notify("Error", "Login Failed", { type: "danger" })
         }
