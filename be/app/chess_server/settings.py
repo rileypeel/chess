@@ -31,7 +31,7 @@ ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', '3.129.46.53']
 SESSION_COOKIE_HTTP_ONLY = False
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = ['http://localhost:3000', 'http://localhost:80', 'http://localhost', 'http://3.129.46.53'] # Here was the problem indeed and it has to be http://localhost:3000, not http://localhost:3000/
+CORS_ORIGIN_WHITELIST = ['http://localhost:3000', 'http://localhost:80', 'http://localhost', 'http://3.129.46.53', 'http://ec2-3-129-46-53.us-east-2.compute.amazonaws.com'] # Here was the problem indeed and it has to be http://localhost:3000, not http://localhost:3000/
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
