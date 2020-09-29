@@ -174,11 +174,8 @@ class GameController:
         self.game = game
         self.user = user
         self.chess_engine = ChessEngine()
-        players = Player.objects.filter(game=game)
-        if players[0].user.id == user.id:
-            self.my_player, self.opponent = players
-        else:
-            self.opponent, self.my_player = players
+        self.my_player = Player.objects.get(game=self.game, user=self.user)
+        self.opponent = Player.objects.filter(game=self.game).exclude(user=self.user)[0]
         if new_game:
             self.start_game()
 
