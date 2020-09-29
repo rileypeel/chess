@@ -24,6 +24,18 @@ const App = () => (
         <Route path={LOGIN}>
           <Login/>
         </Route>
+        <Route exact path='/'>
+        <Route
+          render={({ location }) => (
+            <Redirect
+              to={{
+                pathname: HOME,
+                state: { from: location }
+              }}
+            />
+          )}
+        />
+        </Route>
         <Route path='/'>
           <WebSocketConnection>
             <AcceptModal/>
