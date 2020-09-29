@@ -1,5 +1,5 @@
 //const BASE_URL = 'http://0.0.0.0:8000/'
-const BASE_URL = 'http://3.129.46.53:8000/'
+const BASE_URL = 'http://http://ec2-3-129-46-53.us-east-2.compute.amazonaws.com:8000/'
 const FETCH_USER = `${BASE_URL}user/me/`
 const LOGIN_URL = `${BASE_URL}user/login/`
 const LOGOUT_URL = `${BASE_URL}user/logout/`
