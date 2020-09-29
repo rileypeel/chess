@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', '3.129.46.53']
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', '3.129.46.53', 'ec2-3-129-46-53.us-east-2.compute.amazonaws.com']
 
 
 SESSION_COOKIE_HTTP_ONLY = False
