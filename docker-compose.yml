@@ -8,20 +8,25 @@ services:
       - "8000:8000"
     volumes:
       - ./be/app:/app
-    command: sh -c "python manage.py wait_for_db && python manage.py migrate && daphne -b 0.0.0.0 -p 8000 chess_server.asgi:application"
-    env_file: 
-      - ./.env
+    command: sh -c "python manage.py wait_for_db && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=app
+      - DB_USER=postgres
+      - DB_PASS=supersecretpassword
     depends_on:
       - db
   db:
     image: postgres:10-alpine
-    env_file:
-      - ./.env
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=supersecretpassword
   fe:
     build:
       context: ./fe
     ports:
-      - "80:80"
+      - "80:3000"
     volumes:
       - ./fe/app:/app
       - /fe/app/node_modules
